@@ -2,13 +2,10 @@
 node_modules/
 dist/
 npm-debug.log*
-yarn-debug.log*s
-yarn-error.log*
 **/*.log
 
 tests/**/coverage/
 tests/e2e/reports
-selenium-debug.log
 
 # Editor directories and files
 .idea
@@ -25,32 +22,13 @@ yarn.lock
 /.project
 /plop-templates/
 /build/
-/public/
-/src/assets/
-/src/components/
-/src/directive/
-/src/filters/
-/src/icons/
-/src/layout/
-/src/plugins/
-/src/router/
-/src/store/
-/src/styles/
-/src/utils/
 /.editorconfig
-/.env.development
 /.env.production
 /.env.sit
 /.env.staging
 /.env.uat
 /.eslintignore
 /.eslintrc.js
-/src/App.vue
-/src/main.js
-/src/permission.js
-/src/settings.js
-/*.js
-/*.json
 /*.iml
 /*.yml
 /LICENSE
