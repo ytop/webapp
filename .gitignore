@@ -27,8 +27,6 @@ yarn.lock
 /.env.sit
 /.env.staging
 /.env.uat
-/.eslintignore
-/.eslintrc.js
 /*.iml
 /*.yml
 /LICENSE
