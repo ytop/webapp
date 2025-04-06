@@ -78,6 +78,19 @@ module.exports = {
       })
       .end()
 
+    // Add babel loader configuration
+    config.module
+      .rule('js')
+      .use('babel-loader')
+      .loader('babel-loader')
+      .tap(options => ({
+        ...options,
+        plugins: [
+          '@babel/plugin-proposal-optional-chaining',
+          ...(options.plugins || [])
+        ]
+      }))
+
     // Production optimization
     config.when(process.env.NODE_ENV !== 'development', config => {
       config

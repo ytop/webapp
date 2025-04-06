@@ -13,22 +13,8 @@
     <div
       ref="gaugeChart"
       class="health-score-gauge__chart"
-      :style="{ height: chartHeight + 'px' }"
+      :style="{ height: '140px' }"
     />
-    <div
-      class="health-score-gauge__label"
-    >
-      {{ label }}
-    </div>
-    <div
-      v-if="sublabel"
-      class="health-score-gauge__sublabel"
-    >
-      <a
-        href="#"
-        @click.prevent="viewDashboard"
-      >{{ sublabel }}</a>
-    </div>
   </el-card>
 </template>
 
@@ -54,20 +40,12 @@ export default {
       required: true,
       validator: value => value >= 0 && value <= 5
     },
-    label: {
-      type: String,
-      required: true
-    },
-    sublabel: {
-      type: String,
-      default: ''
-    },
     colors: {
       type: Array,
       default: () => [
-        { value: 0, color: '#67e0e3' }, // Green
-        { value: 2, color: '#37a2da' }, // Light Blue
-        { value: 4, color: '#fd666d' }, // Red
+        { value: 0, color: '#67e0e3' },
+        { value: 2, color: '#37a2da' },
+        { value: 4, color: '#fd666d' },
       ]
     },
     chartHeight: {
@@ -94,29 +72,56 @@ export default {
             min: 0,
             max: 5,
             splitNumber: 5,
-            radius: '80%',
+            startAngle: 180,
+            endAngle: 0,
+            radius: '80%',  // Reduced to make room for the score on the right
+            center: ['40%', '50%'],  // Shifted left to make room for score
             axisLine: {
               lineStyle: {
                 width: 20,
-                color: this.colors.map(color => [
-                  color.value / 5,
-                  color.color
-                ])
+                color: [
+                  [0.25, '#FF4949'], // Strong Red (0-1.25)
+                  [0.5, '#F56C6C'],  // Light Red (1.25-2.5)
+                  [0.75, '#E6A23C'], // Yellow (2.5-3.75)
+                  [1, '#67C23A']     // Green (3.75-5)
+                ]
               }
             },
-            axisTick: { show: false },
-            axisLabel: { show: false },
-            splitLine: { show: false },
             pointer: {
+              icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
+              length: '12%',
+              width: 4,
+              offsetCenter: [0, '-60%'],
               itemStyle: {
                 color: 'auto'
               }
             },
+            axisTick: {
+              show: true,
+              length: 12,
+              lineStyle: {
+                color: 'auto',
+                width: 1
+              }
+            },
+            splitLine: {
+              length: 20,
+              lineStyle: {
+                color: 'auto',
+                width: 2
+              }
+            },
+            axisLabel: {
+              show: false
+            },
             detail: {
               valueAnimation: true,
               formatter: '{value}',
-              fontSize: 20,
-              offsetCenter: [0, '70%']
+              color: '#303133',
+              fontSize: 36,
+              fontWeight: 'bold',
+              offsetCenter: ['100%', '0%'],  // Positioned at the right
+              padding: [0, 0, 0, 20]  // Added right padding
             },
             data: [{ value: this.score }],
             animation: true,
@@ -211,59 +216,17 @@ export default {
 
 <style lang="scss" scoped>
 .health-score-gauge {
-  transition: all 0.3s ease;
+  height: 100%;
 
   &__header {
     font-weight: 500;
   }
 
   &__chart {
-    margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: height 0.3s ease;
-  }
-
-  &__label {
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: 16px;
-  }
-
-  &__sublabel {
-    text-align: center;
-    margin-top: 8px;
-    color: #909399;
-    font-size: 14px;
-
-    a {
-      color: #909399;
-      text-decoration: none;
-      transition: color 0.2s ease;
-
-      &:hover {
-        color: #409EFF;
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 768px) {
-  .health-score-gauge {
-    &__chart {
-      height: 150px !important;
-    }
-
-    &__label {
-      font-size: 14px;
-    }
-
-    &__sublabel {
-      font-size: 12px;
-    }
   }
 }
 </style>

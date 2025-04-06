@@ -7,52 +7,59 @@
       01/03/2023 - 31/03/2024
     </p>
 
-    <el-row
-      :gutter="20"
-      class="dashboard__row"
-    >
-      <el-col
-        :span="6"
-        :xs="24"
-        :sm="12"
-        :md="6"
-      >
-        <health-score-gauge
-          title="Corporate Office Health Score"
-          :score="3.3"
-          label="Moderate"
-          sublabel="Risk Culture"
-          :colors="colors"
-        />
-      </el-col>
+    <el-row :gutter="20">
+      <!-- Left side content -->
       <el-col
         :span="18"
         :xs="24"
-        :sm="12"
+        :sm="24"
         :md="18"
       >
-        <el-row :gutter="10">
+        <!-- Top section with gauge and KPI cards -->
+        <el-row
+          :gutter="20"
+          class="dashboard__row"
+        >
           <el-col
-            v-for="item in categoryScores"
-            :key="item.name"
-            :span="4"
-            :xs="12"
-            :sm="8"
+            :span="6"
+            :xs="24"
+            :sm="12"
             :md="6"
-            :lg="4"
           >
-            <kpi-card
-              :title="`${item.name} Health Score`"
-              :score="item.score"
-              :description="item.description"
+            <health-score-gauge
+              title="Corporate Office Health Score"
+              :score="3.3"
+              :colors="colors"
             />
           </el-col>
+          <el-col
+            :span="18"
+            :xs="24"
+            :sm="12"
+            :md="18"
+          >
+            <el-row :gutter="10">
+              <el-col
+                v-for="item in categoryScores"
+                :key="item.name"
+                :span="4"
+                :xs="12"
+                :sm="8"
+                :md="6"
+                :lg="4"
+              >
+                <kpi-card
+                  :title="`${item.name} Health Score`"
+                  :score="item.score"
+                  :description="item.description"
+                  :color="getScoreColor(item.score)"
+                />
+              </el-col>
+            </el-row>
+          </el-col>
         </el-row>
-      </el-col>
-    </el-row>
 
-    <el-row class="dashboard__row">
-      <el-col :span="24">
+        <!-- Bottom section with table -->
         <el-card
           shadow="never"
           class="dashboard__card"
@@ -61,17 +68,163 @@
             slot="header"
             class="dashboard__card-header"
           >
+            <span>Business Unit Details</span>
+          </div>
+          <el-table
+            v-loading="tableLoading"
+            :data="filteredBusinessUnitData"
+            stripe
+            size="mini"
+            class="dashboard__table"
+            @sort-change="handleSortChange"
+          >
+            <el-table-column
+              prop="unit"
+              label="Business Unit"
+              sortable="custom"
+              min-width="180"
+            />
+            <el-table-column
+              prop="score"
+              label="Score"
+              sortable="custom"
+              width="100"
+            >
+              <template slot-scope="scope">
+                <span :style="{ color: getScoreColor(scope.row.score) }">
+                  {{ scope.row.score }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="inherent"
+              label="Inherent Risk"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="residual"
+              label="Residual Risk"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="activeControls"
+              label="Active Controls"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="reviewedLast12"
+              label="Reviewed Last 12m"
+              sortable="custom"
+              width="150"
+            />
+            <el-table-column
+              prop="controlsTotal"
+              label="Controls Total"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="attestationsQuestions"
+              label="Attestations"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="kriCount"
+              label="KRI Count"
+              sortable="custom"
+              width="100"
+            />
+            <el-table-column
+              prop="kriRed"
+              label="KRI Red"
+              sortable="custom"
+              width="100"
+            />
+            <el-table-column
+              prop="actionsOpen"
+              label="Actions Open"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="actionsOverdue"
+              label="Actions Overdue"
+              sortable="custom"
+              width="140"
+            />
+            <el-table-column
+              prop="auditFindings"
+              label="Audit Findings"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="auditOverdue"
+              label="Audit Overdue"
+              sortable="custom"
+              width="120"
+            />
+            <el-table-column
+              prop="incidents"
+              label="Incidents"
+              sortable="custom"
+              width="100"
+            />
+            <el-table-column
+              prop="estimatedLoss"
+              label="Estimated Loss"
+              sortable="custom"
+              width="120"
+            >
+              <template slot-scope="scope">
+                {{ scope.row.estimatedLoss ? `$${Number(scope.row.estimatedLoss).toLocaleString()}` : '' }}
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="dashboard__pagination">
+            <el-pagination
+              :current-page="currentPage"
+              :page-sizes="[5, 10, 20, 50]"
+              :page-size="pageSize"
+              :total="totalItems"
+              layout="total, sizes, prev, pager, next, jumper"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </div>
+        </el-card>
+      </el-col>
+
+      <!-- Right side filters -->
+      <el-col
+        :span="6"
+        :xs="24"
+        :sm="24"
+        :md="6"
+      >
+        <el-card
+          shadow="never"
+          class="dashboard__card dashboard__filters-card"
+        >
+          <div
+            slot="header"
+            class="dashboard__card-header"
+          >
             <span>Filters</span>
-            <div class="dashboard__filter-controls">
-              <el-input
-                v-model="tableSearch"
-                placeholder="Search business units"
-                prefix-icon="el-icon-search"
-                clearable
-                size="small"
-                class="dashboard__search-input"
-              />
-            </div>
+          </div>
+          <div class="dashboard__filter-controls">
+            <el-input
+              v-model="tableSearch"
+              placeholder="Search business units"
+              prefix-icon="el-icon-search"
+              clearable
+              size="small"
+              class="dashboard__search-input"
+            />
           </div>
           <div class="dashboard__filters">
             <el-tag
@@ -90,159 +243,6 @@
         </el-card>
       </el-col>
     </el-row>
-
-    <el-card
-      shadow="never"
-      class="dashboard__card"
-    >
-      <div
-        slot="header"
-        class="dashboard__card-header"
-      >
-        <span>Business Unit Details</span>
-      </div>
-      <el-table
-        v-loading="tableLoading"
-        :data="filteredBusinessUnitData"
-        stripe
-        size="mini"
-        class="dashboard__table"
-        @sort-change="handleSortChange"
-      >
-        <el-table-column
-          prop="unit"
-          label="Business Unit"
-          width="180"
-          sortable="custom"
-          fixed
-        />
-        <el-table-column
-          prop="score"
-          label="Risk Health Score"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="inherent"
-          label="Inherent Rating"
-          width="120"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="residual"
-          label="Residual Rating"
-          width="120"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="activeControls"
-          label="Active Controls"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="reviewedLast12"
-          label="Reviewed Last 12 mths"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="controlsTotal"
-          label="Controls Total"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="attestationsQuestions"
-          label="Attestations Questions"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="nonCompliance"
-          label="Non Compliance"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="kriCount"
-          label="KRI Count"
-          width="80"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="kriRed"
-          label="Red KRI"
-          width="80"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="actionsOpen"
-          label="Actions Open"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="actionsOverdue"
-          label="Actions Overdue"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="auditFindings"
-          label="Audit Findings"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="auditOverdue"
-          label="Findings Overdue"
-          width="100"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="incidents"
-          label="Incidents"
-          width="80"
-          align="center"
-          sortable="custom"
-        />
-        <el-table-column
-          prop="estimatedLoss"
-          label="Estimated Direct Loss"
-          width="150"
-          align="right"
-          sortable="custom"
-        >
-          <template slot-scope="scope">
-            {{ formatCurrency(scope.row.estimatedLoss) }}
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="dashboard__pagination">
-        <el-pagination
-          :current-page="currentPage"
-          :page-sizes="[5, 10, 20, 50]"
-          :page-size="pageSize"
-          :total="totalItems"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
-      </div>
-    </el-card>
   </div>
 </template>
 
@@ -568,6 +568,40 @@ export default {
     loadData() {
       this.tableLoading = true;
       setTimeout(() => (this.tableLoading = false), 500);
+    },
+    getScoreColor(score) {
+      // Ensure score is between 0 and 5
+      const normalizedScore = Math.max(0, Math.min(5, score));
+      
+      if (normalizedScore >= 3.75) {
+        return '#67C23A'; // Strong Green
+      } else if (normalizedScore >= 2.5) {
+        return '#E6A23C'; // Yellow
+      } else if (normalizedScore >= 1.25) {
+        return '#F56C6C'; // Light Red
+      } else {
+        return '#FF4949'; // Strong Red
+      }
+    },
+    getRatingTagType(rating) {
+      // Add console.log to debug the incoming value
+      console.log('Rating value:', rating);
+      
+      if (!rating) return 'info';
+      
+      // Convert to lowercase and trim any whitespace
+      const normalizedRating = rating.toLowerCase().trim();
+      
+      switch (normalizedRating) {
+        case 'high':
+          return 'danger';
+        case 'moderate':
+          return 'warning';
+        case 'low':
+          return 'success';
+        default:
+          return 'info';
+      }
     }
   }
 };
@@ -595,6 +629,11 @@ export default {
   margin-bottom: 20px;
 }
 
+.dashboard__filters-card {
+  position: sticky;
+  top: 20px;
+}
+
 .dashboard__card-header {
   display: flex;
   justify-content: space-between;
@@ -603,21 +642,24 @@ export default {
 
 .dashboard__filters {
   display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
 }
 
 .dashboard__filter-tag {
-  margin-right: 5px;
+  width: 100%;
+  text-align: left;
 }
 
 .dashboard__filter-controls {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .dashboard__search-input {
-  width: 200px;
+  width: 100%;
 }
 
 .dashboard__table {
@@ -631,8 +673,9 @@ export default {
 }
 
 @media (max-width: 768px) {
-  .dashboard__search-input {
-    width: 100%;
+  .dashboard__filters-card {
+    position: static;
+    margin-bottom: 20px;
   }
 
   .dashboard__card-header {
