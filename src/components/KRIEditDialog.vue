@@ -1,10 +1,17 @@
 <template>
   <div class="kri-edit-dialog">
-    <el-tabs v-model="activeTab">
-      <el-tab-pane
-        label="Basic Information"
-        name="basic"
-      >
+    <!-- Workflow Status Section at the top -->
+    <div class="workflow-section">
+      <h3>Workflow Status</h3>
+      <kri-workflow-status
+        ref="workflowStatus"
+        :status="form.workflowStatus"
+        @workflow-updated="handleWorkflowUpdate"
+        @action-selected="handleActionSelected"
+      />
+    </div>
+
+    <el-divider content-position="left">Basic Information</el-divider>
         <el-form
           ref="kriForm"
           :model="form"
@@ -197,32 +204,18 @@
             </el-col>
           </el-row>
         </el-form>
-      </el-tab-pane>
 
-      <el-tab-pane
-        label="Documents"
-        name="documents"
-      >
-        <kri-document-upload
-          ref="documentUpload"
-          :kri-id="form.kriId"
-          :existing-documents="form.documents"
-          @document-deleted="handleDocumentDeleted"
-        />
-      </el-tab-pane>
+    <!-- Documents Section at the bottom -->
+    <el-divider content-position="left">Documents</el-divider>
 
-      <el-tab-pane
-        label="Workflow"
-        name="workflow"
-      >
-        <kri-workflow-status
-          ref="workflowStatus"
-          :status="form.workflowStatus"
-          @workflow-updated="handleWorkflowUpdate"
-          @action-selected="handleActionSelected"
-        />
-      </el-tab-pane>
-    </el-tabs>
+    <div class="documents-section">
+      <kri-document-upload
+        ref="documentUpload"
+        :kri-id="form.kriId"
+        :existing-documents="form.documents"
+        @document-deleted="handleDocumentDeleted"
+      />
+    </div>
 
     <span
       slot="footer"
@@ -230,7 +223,7 @@
     >
       <el-button @click="handleClose">Cancel</el-button>
       <el-button
-        v-if="activeTab === 'workflow' && workflowActionSelected"
+        v-if="workflowActionSelected"
         type="primary"
         :loading="submitting"
         @click="submitWorkflow"
@@ -238,7 +231,6 @@
         Submit Workflow Action
       </el-button>
       <el-button
-        v-else
         type="primary"
         :loading="submitting"
         @click="saveKRI"
@@ -271,7 +263,7 @@ export default {
 
   data() {
     return {
-      activeTab: 'basic',
+
       submitting: false,
       workflowActionSelected: false,
 
@@ -380,7 +372,6 @@ export default {
     },
 
     handleClose() {
-      this.activeTab = 'basic';
       this.workflowActionSelected = false;
     },
 
@@ -492,12 +483,41 @@ export default {
 
 <style lang="scss" scoped>
 .kri-edit-dialog {
-  .el-tabs {
-    margin-bottom: 20px;
+  .workflow-section {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border-left: 4px solid #409EFF;
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #303133;
+      font-size: 18px;
+    }
+  }
+
+  .documents-section {
+    margin-top: 20px;
+    margin-bottom: 30px;
   }
 
   .el-divider {
-    margin: 20px 0;
+    margin: 30px 0;
+    font-weight: bold;
+    color: #303133;
+    font-size: 16px;
+  }
+
+  .el-form {
+    margin-bottom: 30px;
+  }
+
+  .dialog-footer {
+    display: block;
+    margin-top: 20px;
+    text-align: right;
   }
 }
 </style>

@@ -1,26 +1,51 @@
 <template>
   <div class="workflow-status">
-    <el-steps 
-      :active="activeStep" 
+    <el-steps
+      :active="activeStep"
       finish-status="success"
-      simple
+      process-status="process"
+      align-center
     >
-      <el-step title="Draft" />
-      <el-step title="Pending Review" />
-      <el-step title="Under Review" />
-      <el-step title="Approved/Rejected" />
+      <el-step title="Draft">
+        <template slot="icon">
+          <div :class="['custom-step-icon', { active: currentStatus === 'Draft' }]">
+            <i class="el-icon-edit-outline"></i>
+          </div>
+        </template>
+      </el-step>
+      <el-step title="Pending Review">
+        <template slot="icon">
+          <div :class="['custom-step-icon', { active: currentStatus === 'Pending Review' }]">
+            <i class="el-icon-document-checked"></i>
+          </div>
+        </template>
+      </el-step>
+      <el-step title="Under Review">
+        <template slot="icon">
+          <div :class="['custom-step-icon', { active: currentStatus === 'Under Review' }]">
+            <i class="el-icon-view"></i>
+          </div>
+        </template>
+      </el-step>
+      <el-step title="Approved/Rejected">
+        <template slot="icon">
+          <div :class="['custom-step-icon', { active: currentStatus === 'Approved' || currentStatus === 'Rejected' }]">
+            <i :class="currentStatus === 'Approved' ? 'el-icon-check' : (currentStatus === 'Rejected' ? 'el-icon-close' : 'el-icon-finished')"></i>
+          </div>
+        </template>
+      </el-step>
     </el-steps>
-    
+
     <div class="workflow-actions">
       <el-form-item label="Current Status">
         <el-tag :type="getStatusType(currentStatus)">
           {{ currentStatus }}
         </el-tag>
       </el-form-item>
-      
+
       <el-form-item label="Action">
-        <el-select 
-          v-model="selectedAction" 
+        <el-select
+          v-model="selectedAction"
           placeholder="Select action"
           :disabled="!canTakeAction"
         >
@@ -32,7 +57,7 @@
           />
         </el-select>
       </el-form-item>
-      
+
       <el-form-item
         v-if="selectedAction"
         label="Comments"
@@ -51,7 +76,7 @@
 <script>
 export default {
   name: 'KRIWorkflowStatus',
-  
+
   props: {
     status: {
       type: String,
@@ -59,7 +84,7 @@ export default {
       validator: value => ['Draft', 'Pending Review', 'Under Review', 'Approved', 'Rejected'].includes(value)
     }
   },
-  
+
   data() {
     return {
       currentStatus: this.status,
@@ -67,7 +92,7 @@ export default {
       comments: ''
     };
   },
-  
+
   computed: {
     activeStep() {
       const statusMap = {
@@ -79,7 +104,7 @@ export default {
       };
       return statusMap[this.currentStatus] || 0;
     },
-    
+
     availableActions() {
       const actions = {
         'Draft': [
@@ -101,14 +126,14 @@ export default {
           { label: 'Reopen', value: 'reopen' }
         ]
       };
-      
+
       return actions[this.currentStatus] || [];
     },
-    
+
     canTakeAction() {
       return this.availableActions.length > 0;
     },
-    
+
     workflowData() {
       return {
         status: this.currentStatus,
@@ -118,14 +143,14 @@ export default {
       };
     }
   },
-  
+
   watch: {
     status(newStatus) {
       this.currentStatus = newStatus;
       this.selectedAction = '';
       this.comments = '';
     },
-    
+
     selectedAction(newAction) {
       if (newAction) {
         this.$emit('action-selected', {
@@ -135,7 +160,7 @@ export default {
       }
     }
   },
-  
+
   methods: {
     getStatusType(status) {
       const typeMap = {
@@ -147,16 +172,16 @@ export default {
       };
       return typeMap[status] || 'info';
     },
-    
+
     submitAction() {
       if (!this.selectedAction) {
         this.$message.warning('Please select an action');
         return null;
       }
-      
+
       // Determine the new status based on the selected action
       let newStatus = this.currentStatus;
-      
+
       switch (this.selectedAction) {
         case 'submit':
           newStatus = 'Pending Review';
@@ -180,23 +205,23 @@ export default {
           newStatus = 'Draft';
           break;
       }
-      
+
       // Update the current status
       this.currentStatus = newStatus;
-      
+
       // Return the workflow data
       const result = {
         ...this.workflowData,
         newStatus
       };
-      
+
       // Reset the form
       this.selectedAction = '';
       this.comments = '';
-      
+
       // Emit the event
       this.$emit('workflow-updated', result);
-      
+
       return result;
     }
   }
@@ -206,16 +231,54 @@ export default {
 <style lang="scss" scoped>
 .workflow-status {
   margin-bottom: 20px;
-  
+
   .el-steps {
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
-  
+
+  .custom-step-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f5f7fa;
+    color: #909399;
+    transition: all 0.3s;
+
+    &.active {
+      background-color: #409EFF;
+      color: white;
+      transform: scale(1.2);
+      box-shadow: 0 0 10px rgba(64, 158, 255, 0.5);
+    }
+
+    i {
+      font-size: 16px;
+    }
+  }
+
   .workflow-actions {
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: 30px;
+    padding: 20px;
     background-color: #f8f8f8;
     border-radius: 4px;
+    border: 1px solid #ebeef5;
+  }
+
+  .el-tag {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+
+  .el-select {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .el-form-item {
+    margin-bottom: 20px;
   }
 }
 </style>
