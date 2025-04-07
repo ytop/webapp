@@ -84,9 +84,9 @@ module.exports = {
       .use('babel-loader')
       .loader('babel-loader')
       .tap(options => ({
-        ...options,
+        ...(options || {}),
         plugins: [
-          ...(options.plugins || [])
+          ...((options && options.plugins) || [])
         ]
       }))
 
