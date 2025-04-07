@@ -1,11 +1,8 @@
 <template>
   <div class="dashboard">
     <h2 class="dashboard__title">
-      Corporate Office Risk Framework Dashboard
+      KRI Dashboard <span class="dashboard__date-range">01/03/2023 - 31/03/2024</span>
     </h2>
-    <p class="dashboard__date-range">
-      01/03/2023 - 31/03/2024
-    </p>
 
     <el-row :gutter="20">
       <!-- Left side content -->
@@ -27,7 +24,7 @@
             :md="6"
           >
             <health-score-gauge
-              title="Corporate Office Health Score"
+              title="Risk Health Score"
               :score="3.3"
               :colors="colors"
             />
@@ -53,6 +50,7 @@
                   :score="item.score"
                   :description="item.description"
                   :color="getScoreColor(item.score)"
+                  :body-style="{ padding: '15px', height: '192px' }"
                 />
               </el-col>
             </el-row>

@@ -2,7 +2,7 @@
   <el-card
     shadow="never"
     class="health-score-gauge"
-    :body-style="{ padding: '15px' }"
+    :body-style="{ padding: '11px' }"
   >
     <div
       slot="header"
@@ -13,7 +13,7 @@
     <div
       ref="gaugeChart"
       class="health-score-gauge__chart"
-      :style="{ height: '140px' }"
+      :style="{ height: '180px' }"
     />
   </el-card>
 </template>
@@ -50,7 +50,7 @@ export default {
     },
     chartHeight: {
       type: Number,
-      default: 180
+      default: 135
     },
     animationDuration: {
       type: Number,
@@ -74,8 +74,8 @@ export default {
             splitNumber: 5,
             startAngle: 180,
             endAngle: 0,
-            radius: '80%',  // Reduced to make room for the score on the right
-            center: ['40%', '50%'],  // Shifted left to make room for score
+            radius: '56%',  // Reduced to 75% of original 75%
+            center: ['50%', '45%'],  // Moved up slightly to make room for value
             axisLine: {
               lineStyle: {
                 width: 20,
@@ -89,8 +89,8 @@ export default {
             },
             pointer: {
               icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z',
-              length: '12%',
-              width: 4,
+              length: '9%',
+              width: 3,
               offsetCenter: [0, '-60%'],
               itemStyle: {
                 color: 'auto'
@@ -98,14 +98,14 @@ export default {
             },
             axisTick: {
               show: true,
-              length: 12,
+              length: 9,
               lineStyle: {
                 color: 'auto',
                 width: 1
               }
             },
             splitLine: {
-              length: 20,
+              length: 15,
               lineStyle: {
                 color: 'auto',
                 width: 2
@@ -114,14 +114,17 @@ export default {
             axisLabel: {
               show: false
             },
+            title: {
+              show: false
+            },
             detail: {
               valueAnimation: true,
               formatter: '{value}',
               color: '#303133',
-              fontSize: 36,
+              fontSize: 27,
               fontWeight: 'bold',
-              offsetCenter: ['100%', '0%'],  // Positioned at the right
-              padding: [0, 0, 0, 20]  // Added right padding
+              offsetCenter: [0, '85%'],  // Adjusted position for value
+              padding: [15, 0, 0, 0]
             },
             data: [{ value: this.score }],
             animation: true,
@@ -148,9 +151,10 @@ export default {
     }
   },
   mounted() {
-    this.$nextTick(() => {
+    // Use a small delay to ensure DOM is fully rendered
+    setTimeout(() => {
       this.initChart();
-    });
+    }, 100);
   },
   beforeDestroy() {
     this.destroyChart();
@@ -174,6 +178,13 @@ export default {
 
       // Add resize event listener
       window.addEventListener('resize', this.resizeHandler);
+
+      // Force a resize after initialization to ensure proper rendering
+      this.$nextTick(() => {
+        if (this.chart) {
+          this.chart.resize();
+        }
+      });
     },
 
     updateChart() {
@@ -201,6 +212,16 @@ export default {
       }
     },
 
+    // Method to manually refresh the chart if needed
+    refreshChart() {
+      if (this.chart) {
+        this.chart.resize();
+        this.updateChart();
+      } else {
+        this.initChart();
+      }
+    },
+
     viewDashboard() {
       // Use Vue Router for navigation if available
       if (this.$router) {
@@ -217,9 +238,12 @@ export default {
 <style lang="scss" scoped>
 .health-score-gauge {
   height: 100%;
+  transform: scale(0.75);
+  transform-origin: center center;
 
   &__header {
     font-weight: 500;
+    font-size: 0.95rem;
   }
 
   &__chart {
@@ -227,6 +251,7 @@ export default {
     justify-content: center;
     align-items: center;
     transition: height 0.3s ease;
+    margin-top: -15px;  // Reduced negative margin to adjust spacing
   }
 }
 </style>
