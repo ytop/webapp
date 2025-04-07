@@ -38,26 +38,31 @@
 
     <div class="workflow-actions">
       <el-form label-width="120px">
-        <el-form-item label="Current Status">
-          <el-tag :type="getStatusType(currentStatus)">
-            {{ currentStatus }}
-          </el-tag>
-        </el-form-item>
-
-        <el-form-item label="Action">
-          <el-select
-            v-model="selectedAction"
-            placeholder="Select action"
-            :disabled="!canTakeAction"
-          >
-            <el-option
-              v-for="action in availableActions"
-              :key="action.value"
-              :label="action.label"
-              :value="action.value"
-            />
-          </el-select>
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="Current Status">
+              <el-tag :type="getStatusType(currentStatus)">
+                {{ currentStatus }}
+              </el-tag>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Action">
+              <el-select
+                v-model="selectedAction"
+                placeholder="Select action"
+                :disabled="!canTakeAction"
+              >
+                <el-option
+                  v-for="action in availableActions"
+                  :key="action.value"
+                  :label="action.label"
+                  :value="action.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
 
         <el-form-item
           v-if="selectedAction"
@@ -274,7 +279,7 @@ export default {
 
   .workflow-actions {
     margin-top: 30px;
-    padding: 20px;
+    padding: 0 20px;  /* Changed from padding: 20px to only have horizontal padding */
     background-color: #f8f8f8;
     border-radius: 4px;
     border: 1px solid #ebeef5;
@@ -292,6 +297,24 @@ export default {
 
   .el-form-item {
     margin-bottom: 20px;
+  }
+
+  /* Form element styles */
+  ::v-deep .el-form-item__label {
+    line-height: 40px;
+    font-size: 14px;
+  }
+
+  ::v-deep .el-form-item__content {
+    line-height: 40px;
+  }
+
+  ::v-deep .el-step__title {
+    font-size: 14px;
+  }
+
+  ::v-deep .el-step__head {
+    padding-right: 10px;
   }
 }
 </style>
