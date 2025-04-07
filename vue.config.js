@@ -86,7 +86,6 @@ module.exports = {
       .tap(options => ({
         ...options,
         plugins: [
-          '@babel/plugin-proposal-optional-chaining',
           ...(options.plugins || [])
         ]
       }))

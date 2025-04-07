@@ -11,7 +11,7 @@
         <dashboard v-if="activeTab === 'dashboard'" />
       </el-tab-pane>
       <el-tab-pane
-        label="Task"
+        label="Collection"
         name="task"
       >
         <task v-if="activeTab === 'task'" />
