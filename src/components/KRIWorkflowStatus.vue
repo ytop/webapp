@@ -9,66 +9,68 @@
       <el-step title="Draft">
         <template slot="icon">
           <div :class="['custom-step-icon', { active: currentStatus === 'Draft' }]">
-            <i class="el-icon-edit-outline"></i>
+            <i class="el-icon-edit-outline" />
           </div>
         </template>
       </el-step>
       <el-step title="Pending Review">
         <template slot="icon">
           <div :class="['custom-step-icon', { active: currentStatus === 'Pending Review' }]">
-            <i class="el-icon-document-checked"></i>
+            <i class="el-icon-document-checked" />
           </div>
         </template>
       </el-step>
       <el-step title="Under Review">
         <template slot="icon">
           <div :class="['custom-step-icon', { active: currentStatus === 'Under Review' }]">
-            <i class="el-icon-view"></i>
+            <i class="el-icon-view" />
           </div>
         </template>
       </el-step>
       <el-step title="Approved/Rejected">
         <template slot="icon">
           <div :class="['custom-step-icon', { active: currentStatus === 'Approved' || currentStatus === 'Rejected' }]">
-            <i :class="currentStatus === 'Approved' ? 'el-icon-check' : (currentStatus === 'Rejected' ? 'el-icon-close' : 'el-icon-finished')"></i>
+            <i :class="currentStatus === 'Approved' ? 'el-icon-check' : (currentStatus === 'Rejected' ? 'el-icon-close' : 'el-icon-finished')" />
           </div>
         </template>
       </el-step>
     </el-steps>
 
     <div class="workflow-actions">
-      <el-form-item label="Current Status">
-        <el-tag :type="getStatusType(currentStatus)">
-          {{ currentStatus }}
-        </el-tag>
-      </el-form-item>
+      <el-form label-width="120px">
+        <el-form-item label="Current Status">
+          <el-tag :type="getStatusType(currentStatus)">
+            {{ currentStatus }}
+          </el-tag>
+        </el-form-item>
 
-      <el-form-item label="Action">
-        <el-select
-          v-model="selectedAction"
-          placeholder="Select action"
-          :disabled="!canTakeAction"
+        <el-form-item label="Action">
+          <el-select
+            v-model="selectedAction"
+            placeholder="Select action"
+            :disabled="!canTakeAction"
+          >
+            <el-option
+              v-for="action in availableActions"
+              :key="action.value"
+              :label="action.label"
+              :value="action.value"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item
+          v-if="selectedAction"
+          label="Comments"
         >
-          <el-option
-            v-for="action in availableActions"
-            :key="action.value"
-            :label="action.label"
-            :value="action.value"
+          <el-input
+            v-model="comments"
+            type="textarea"
+            :rows="3"
+            placeholder="Add comments (optional)"
           />
-        </el-select>
-      </el-form-item>
-
-      <el-form-item
-        v-if="selectedAction"
-        label="Comments"
-      >
-        <el-input
-          v-model="comments"
-          type="textarea"
-          :rows="3"
-          placeholder="Add comments (optional)"
-        />
-      </el-form-item>
+        </el-form-item>
+      </el-form>
     </div>
   </div>
 </template>
@@ -80,14 +82,14 @@ export default {
   props: {
     status: {
       type: String,
-      required: true,
-      validator: value => ['Draft', 'Pending Review', 'Under Review', 'Approved', 'Rejected'].includes(value)
+      default: 'Draft',
+      validator: value => !value || ['Draft', 'Pending Review', 'Under Review', 'Approved', 'Rejected'].includes(value)
     }
   },
 
   data() {
     return {
-      currentStatus: this.status,
+      currentStatus: this.status || 'Draft',
       selectedAction: '',
       comments: ''
     };
@@ -145,10 +147,14 @@ export default {
   },
 
   watch: {
-    status(newStatus) {
-      this.currentStatus = newStatus;
-      this.selectedAction = '';
-      this.comments = '';
+    status: {
+      immediate: true,
+      handler(newStatus) {
+        console.log('KRIWorkflowStatus - status prop changed:', newStatus);
+        this.currentStatus = newStatus;
+        this.selectedAction = '';
+        this.comments = '';
+      }
     },
 
     selectedAction(newAction) {
@@ -159,6 +165,13 @@ export default {
         });
       }
     }
+  },
+
+  mounted() {
+    console.log('KRIWorkflowStatus mounted - status prop:', this.status);
+    console.log('KRIWorkflowStatus mounted - currentStatus:', this.currentStatus);
+    console.log('KRIWorkflowStatus mounted - activeStep:', this.activeStep);
+    console.log('KRIWorkflowStatus mounted - availableActions:', this.availableActions);
   },
 
   methods: {

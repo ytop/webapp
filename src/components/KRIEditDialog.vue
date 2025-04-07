@@ -4,209 +4,220 @@
     <div class="workflow-section">
       <h3>Workflow Status</h3>
       <kri-workflow-status
+        v-if="form && form.workflowStatus"
         ref="workflowStatus"
         :status="form.workflowStatus"
         @workflow-updated="handleWorkflowUpdate"
         @action-selected="handleActionSelected"
       />
+      <div
+        v-else
+        class="loading-placeholder"
+      >
+        <i class="el-icon-loading" /> Loading workflow status...
+      </div>
     </div>
 
-    <el-divider content-position="left">Basic Information</el-divider>
-        <el-form
-          ref="kriForm"
-          :model="form"
-          :rules="formRules"
-          label-width="140px"
-          size="small"
-        >
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item
-                label="KRI ID"
-                prop="kriId"
-              >
-                <el-input
-                  v-model="form.kriId"
-                  disabled
-                />
-              </el-form-item>
+    <el-divider content-position="left">
+      Basic Information
+    </el-divider>
+    <el-form
+      ref="kriForm"
+      :model="form"
+      :rules="formRules"
+      label-width="140px"
+      size="small"
+    >
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item
+            label="KRI ID"
+            prop="kriId"
+          >
+            <el-input
+              v-model="form.kriId"
+              disabled
+            />
+          </el-form-item>
 
-              <el-form-item
-                label="KRI Name"
-                prop="name"
-              >
-                <el-input v-model="form.name" />
-              </el-form-item>
+          <el-form-item
+            label="KRI Name"
+            prop="name"
+          >
+            <el-input v-model="form.name" />
+          </el-form-item>
 
-              <el-form-item
-                label="Description"
-                prop="kriDesc"
-              >
-                <el-input
-                  v-model="form.kriDesc"
-                  type="textarea"
-                  :rows="4"
-                  :maxlength="500"
-                  show-word-limit
-                />
-              </el-form-item>
+          <el-form-item
+            label="Description"
+            prop="kriDesc"
+          >
+            <el-input
+              v-model="form.kriDesc"
+              type="textarea"
+              :rows="4"
+              :maxlength="500"
+              show-word-limit
+            />
+          </el-form-item>
 
-              <el-form-item
-                label="Data Provider"
-                prop="dataProvider"
-              >
-                <el-input v-model="form.dataProvider" />
-              </el-form-item>
+          <el-form-item
+            label="Data Provider"
+            prop="dataProvider"
+          >
+            <el-input v-model="form.dataProvider" />
+          </el-form-item>
 
-              <el-form-item
-                label="Owner"
-                prop="owner"
-              >
-                <el-input v-model="form.owner" />
-              </el-form-item>
-            </el-col>
+          <el-form-item
+            label="Owner"
+            prop="owner"
+          >
+            <el-input v-model="form.owner" />
+          </el-form-item>
+        </el-col>
 
-            <el-col :span="12">
-              <el-form-item
-                label="L1 Risk Type"
-                prop="l1RiskType"
-              >
-                <el-select
-                  v-model="form.l1RiskType"
-                  placeholder="Select L1 Risk Type"
-                  style="width: 100%"
-                >
-                  <el-option
-                    v-for="type in riskTypes"
-                    :key="type"
-                    :label="type"
-                    :value="type"
-                  />
-                </el-select>
-              </el-form-item>
+        <el-col :span="12">
+          <el-form-item
+            label="L1 Risk Type"
+            prop="l1RiskType"
+          >
+            <el-select
+              v-model="form.l1RiskType"
+              placeholder="Select L1 Risk Type"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="type in riskTypes"
+                :key="type"
+                :label="type"
+                :value="type"
+              />
+            </el-select>
+          </el-form-item>
 
-              <el-form-item
-                label="L2 Risk Type"
-                prop="l2RiskType"
-              >
-                <el-select
-                  v-model="form.l2RiskType"
-                  placeholder="Select L2 Risk Type"
-                  style="width: 100%"
-                  :disabled="!form.l1RiskType"
-                >
-                  <el-option
-                    v-for="type in l2RiskTypeOptions"
-                    :key="type"
-                    :label="type"
-                    :value="type"
-                  />
-                </el-select>
-              </el-form-item>
+          <el-form-item
+            label="L2 Risk Type"
+            prop="l2RiskType"
+          >
+            <el-select
+              v-model="form.l2RiskType"
+              placeholder="Select L2 Risk Type"
+              style="width: 100%"
+              :disabled="!form.l1RiskType"
+            >
+              <el-option
+                v-for="type in l2RiskTypeOptions"
+                :key="type"
+                :label="type"
+                :value="type"
+              />
+            </el-select>
+          </el-form-item>
 
-              <el-form-item
-                label="Report Cycle"
-                prop="reportCycle"
-              >
-                <el-select
-                  v-model="form.reportCycle"
-                  placeholder="Select Report Cycle"
-                  style="width: 100%"
-                >
-                  <el-option
-                    label="Daily"
-                    value="Daily"
-                  />
-                  <el-option
-                    label="Weekly"
-                    value="Weekly"
-                  />
-                  <el-option
-                    label="Monthly"
-                    value="Monthly"
-                  />
-                  <el-option
-                    label="Quarterly"
-                    value="Quarterly"
-                  />
-                </el-select>
-              </el-form-item>
+          <el-form-item
+            label="Report Cycle"
+            prop="reportCycle"
+          >
+            <el-select
+              v-model="form.reportCycle"
+              placeholder="Select Report Cycle"
+              style="width: 100%"
+            >
+              <el-option
+                label="Daily"
+                value="Daily"
+              />
+              <el-option
+                label="Weekly"
+                value="Weekly"
+              />
+              <el-option
+                label="Monthly"
+                value="Monthly"
+              />
+              <el-option
+                label="Quarterly"
+                value="Quarterly"
+              />
+            </el-select>
+          </el-form-item>
 
-              <el-form-item
-                label="RAS Status"
-                prop="rasStatus"
-              >
-                <el-radio-group v-model="form.rasStatus">
-                  <el-radio label="RAS">
-                    RAS
-                  </el-radio>
-                  <el-radio label="Non-RAS">
-                    Non-RAS
-                  </el-radio>
-                </el-radio-group>
-              </el-form-item>
+          <el-form-item
+            label="RAS Status"
+            prop="rasStatus"
+          >
+            <el-radio-group v-model="form.rasStatus">
+              <el-radio label="RAS">
+                RAS
+              </el-radio>
+              <el-radio label="Non-RAS">
+                Non-RAS
+              </el-radio>
+            </el-radio-group>
+          </el-form-item>
 
-              <el-form-item
-                label="Status"
-                prop="status"
-              >
-                <el-select
-                  v-model="form.status"
-                  placeholder="Select Status"
-                  style="width: 100%"
-                >
-                  <el-option
-                    label="Active"
-                    value="Active"
-                  />
-                  <el-option
-                    label="Inactive"
-                    value="Inactive"
-                  />
-                </el-select>
-              </el-form-item>
-            </el-col>
-          </el-row>
+          <el-form-item
+            label="Status"
+            prop="status"
+          >
+            <el-select
+              v-model="form.status"
+              placeholder="Select Status"
+              style="width: 100%"
+            >
+              <el-option
+                label="Active"
+                value="Active"
+              />
+              <el-option
+                label="Inactive"
+                value="Inactive"
+              />
+            </el-select>
+          </el-form-item>
+        </el-col>
+      </el-row>
 
-          <el-divider content-position="left">
-            Thresholds
-          </el-divider>
+      <el-divider content-position="left">
+        Thresholds
+      </el-divider>
 
-          <el-row :gutter="20">
-            <el-col :span="12">
-              <el-form-item
-                label="Yellow Threshold"
-                prop="yellowThreshold"
-              >
-                <el-input-number
-                  v-model="form.yellowThreshold"
-                  :precision="2"
-                  :step="1"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </el-form-item>
-            </el-col>
+      <el-row :gutter="20">
+        <el-col :span="12">
+          <el-form-item
+            label="Yellow Threshold"
+            prop="yellowThreshold"
+          >
+            <el-input-number
+              v-model="form.yellowThreshold"
+              :precision="2"
+              :step="1"
+              :min="0"
+              style="width: 100%"
+            />
+          </el-form-item>
+        </el-col>
 
-            <el-col :span="12">
-              <el-form-item
-                label="Red Threshold"
-                prop="redThreshold"
-              >
-                <el-input-number
-                  v-model="form.redThreshold"
-                  :precision="2"
-                  :step="1"
-                  :min="0"
-                  style="width: 100%"
-                />
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
+        <el-col :span="12">
+          <el-form-item
+            label="Red Threshold"
+            prop="redThreshold"
+          >
+            <el-input-number
+              v-model="form.redThreshold"
+              :precision="2"
+              :step="1"
+              :min="0"
+              style="width: 100%"
+            />
+          </el-form-item>
+        </el-col>
+      </el-row>
+    </el-form>
 
     <!-- Documents Section at the bottom -->
-    <el-divider content-position="left">Documents</el-divider>
+    <el-divider content-position="left">
+      Documents
+    </el-divider>
 
     <div class="documents-section">
       <kri-document-upload
@@ -250,8 +261,8 @@ export default {
   name: 'KRIEditDialog',
 
   components: {
-    KRIDocumentUpload,
-    KRIWorkflowStatus
+    'kri-document-upload': KRIDocumentUpload,
+    'kri-workflow-status': KRIWorkflowStatus
   },
 
   props: {
@@ -348,6 +359,8 @@ export default {
 
   mounted() {
     console.log('KRIEditDialog mounted - kriData:', this.kriData);
+    console.log('KRIEditDialog mounted - form:', this.form);
+    console.log('KRIEditDialog mounted - form.workflowStatus:', this.form.workflowStatus);
   },
 
   methods: {
@@ -495,6 +508,19 @@ export default {
       margin-bottom: 15px;
       color: #303133;
       font-size: 18px;
+    }
+
+    .loading-placeholder {
+      padding: 20px;
+      text-align: center;
+      color: #909399;
+      font-size: 14px;
+
+      i {
+        margin-right: 5px;
+        font-size: 16px;
+        color: #409EFF;
+      }
     }
   }
 

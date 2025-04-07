@@ -7,9 +7,9 @@
           type="primary"
           size="small"
           icon="el-icon-upload"
-          @click="uploadFiles"
           :loading="uploading"
           :disabled="fileList.length === 0"
+          @click="uploadFiles"
         >
           Upload Selected Files
         </el-button>
@@ -44,8 +44,18 @@
     </div>
 
     <div class="document-list">
-      <h4>Uploaded Documents <el-tag size="small" type="info">{{ documents.length }} document(s)</el-tag></h4>
-      <el-empty v-if="documents.length === 0" description="No documents uploaded yet" />
+      <h4>
+        Uploaded Documents <el-tag
+          size="small"
+          type="info"
+        >
+          {{ documents.length }} document(s)
+        </el-tag>
+      </h4>
+      <el-empty
+        v-if="documents.length === 0"
+        description="No documents uploaded yet"
+      />
       <el-table
         v-else
         :data="documents"
