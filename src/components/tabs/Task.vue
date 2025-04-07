@@ -52,137 +52,188 @@
       </el-col>
     </el-row>
 
-    <el-card shadow="never">
-      <div
-        v-if="loading"
-        class="loading-container"
-      >
-        <el-skeleton
-          :rows="5"
-          animated
-        />
-      </div>
-      <div v-else>
-        <el-table
-          v-loading="tableLoading"
-          element-loading-text="Loading data..."
-          :data="paginatedData"
-          stripe
-          style="width: 100%"
-          size="mini"
-          @row-click="handleRowClick"
-        >
-          <el-table-column
-            prop="name"
-            label="Name"
-            width="250"
-            sortable
+    <el-row :gutter="20">
+      <el-col :span="18">
+        <el-card shadow="never">
+          <div
+            v-if="loading"
+            class="loading-container"
           >
-            <template slot-scope="scope">
-              <div>{{ scope.row.name }}</div>
-              <div style="font-size: 11px; color: grey;">
-                {{ scope.row.path }}
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="collectionStatus"
-            label="Collection Status"
-            width="150"
-            sortable
-          >
-            <template slot-scope="scope">
-              <el-tag
-                :type="getStatusType(scope.row.collectionStatus)"
-                size="mini"
-                effect="light"
+            <el-skeleton
+              :rows="5"
+              animated
+            />
+          </div>
+          <div v-else>
+            <el-table
+              v-loading="tableLoading"
+              element-loading-text="Loading data..."
+              :data="paginatedData"
+              stripe
+              style="width: 100%"
+              size="mini"
+              @row-click="handleRowClick"
+            >
+              <el-table-column
+                prop="name"
+                label="Name"
+                min-width="300"
+                sortable
               >
-                {{ scope.row.collectionStatus }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="valueDate"
-            label="Value Date"
-            width="120"
-            align="center"
-            sortable
-          />
-          <el-table-column
-            prop="value"
-            label="Value"
-            width="100"
-            align="center"
-            sortable
-          />
-          <el-table-column
-            prop="breachStatus"
-            label="Breach Status"
-            width="120"
-            align="center"
-            sortable
-          >
-            <template slot-scope="scope">
-              <el-tag
-                v-if="scope.row.breachStatus"
-                :type="getBreachType(scope.row.breachStatus)"
-                size="mini"
+                <template slot-scope="scope">
+                  <div>{{ scope.row.name }}</div>
+                  <div style="font-size: 11px; color: grey;">
+                    {{ scope.row.path }}
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="collectionStatus"
+                label="Collection Status"
+                min-width="180"
+                sortable
               >
-                {{ scope.row.breachStatus }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="tags"
-            label="Tags"
-            width="100"
-            align="center"
-          >
-            <template slot-scope="scope">
-              <i
-                v-if="scope.row.hasTags"
-                class="el-icon-price-tag"
+                <template slot-scope="scope">
+                  <el-tag
+                    :type="getStatusType(scope.row.collectionStatus)"
+                    size="mini"
+                    effect="light"
+                  >
+                    {{ scope.row.collectionStatus }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="valueDate"
+                label="Value Date"
+                min-width="150"
+                align="center"
+                sortable
               />
-            </template>
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            label="Actions"
-            width="100"
-          >
-            <template slot-scope="scope">
-              <el-button
-                v-if="scope.row.collectionStatus === 'Awaiting Collection'"
-                type="text"
-                size="small"
-                @click.stop="handleEdit(scope.row)"
+              <el-table-column
+                prop="value"
+                label="Value"
+                min-width="120"
+                align="center"
+                sortable
+              />
+              <el-table-column
+                prop="breachStatus"
+                label="Breach Status"
+                min-width="150"
+                align="center"
+                sortable
               >
-                Edit
-              </el-button>
-              <el-button
-                type="text"
-                size="small"
-                @click.stop="handleView(scope.row)"
+                <template slot-scope="scope">
+                  <el-tag
+                    v-if="scope.row.breachStatus"
+                    :type="getBreachType(scope.row.breachStatus)"
+                    size="mini"
+                  >
+                    {{ scope.row.breachStatus }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column
+                prop="tags"
+                label="Tags"
+                min-width="120"
+                align="center"
               >
-                View
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+                <template slot-scope="scope">
+                  <i
+                    v-if="scope.row.hasTags"
+                    class="el-icon-price-tag"
+                  />
+                </template>
+              </el-table-column>
+              <el-table-column
+                fixed="right"
+                label="Actions"
+                min-width="120"
+              >
+                <template slot-scope="scope">
+                  <el-button
+                    v-if="scope.row.collectionStatus === 'Awaiting Collection'"
+                    type="text"
+                    size="small"
+                    @click.stop="handleEdit(scope.row)"
+                  >
+                    Edit
+                  </el-button>
+                  <el-button
+                    type="text"
+                    size="small"
+                    @click.stop="handleView(scope.row)"
+                  >
+                    View
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
 
-        <div style="margin-top: 20px; text-align: right;">
-          <el-pagination
-            :current-page.sync="currentPage"
-            :page-sizes="[5, 10, 20, 50]"
-            :page-size="pageSize"
-            :total="totalItems"
-            layout="total, sizes, prev, pager, next"
-            @size-change="handleSizeChange"
-            @current-change="handlePageChange"
-          />
-        </div>
-      </div>
-    </el-card>
+            <div style="margin-top: 20px; text-align: right;">
+              <el-pagination
+                :current-page.sync="currentPage"
+                :page-sizes="[5, 10, 20, 50]"
+                :page-size="pageSize"
+                :total="totalItems"
+                layout="total, sizes, prev, pager, next"
+                @size-change="handleSizeChange"
+                @current-change="handlePageChange"
+              />
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      
+      <el-col :span="6">
+        <el-card
+          shadow="never"
+          class="info-panel"
+        >
+          <div class="info-panel__header">
+            <span class="required-note">* Modified Required *</span>
+            <el-button
+              size="mini"
+              type="text"
+            >
+              New
+            </el-button>
+          </div>
+          
+          <div class="info-panel__note">
+            Note: KRI Last Value Information section is automatically set when new KRI values are submitted
+          </div>
+
+          <div class="info-panel__attention">
+            1 item requires attention.
+          </div>
+
+          <el-form
+            label-position="left"
+            size="mini"
+            class="info-panel__form"
+          >
+            <el-form-item label="All Key Items (9)">
+              <el-collapse>
+                <el-collapse-item>
+                  <el-form-item label="Frequency *" />
+                  <el-form-item label="Description *" />
+                  <el-form-item label="Owner *" />
+                  <el-form-item label="KRI Capture *" />
+                  <el-form-item label="Status *" />
+                  <el-form-item label="KRI Value Approval Required *" />
+                  <el-form-item label="Collection Start Date *" />
+                  <el-form-item label="Yellow Threshold *" />
+                  <el-form-item label="Red Threshold *" />
+                </el-collapse-item>
+              </el-collapse>
+            </el-form-item>
+          </el-form>
+        </el-card>
+      </el-col>
+    </el-row>
 
     <kri-value-entry
       :visible.sync="dialogVisible"
@@ -387,8 +438,43 @@ export default {
 }
 </script>
 
-<style scoped>
-.loading-container {
-  padding: 20px;
+<style lang="scss" scoped>
+.info-panel {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  &__note {
+    font-size: 12px;
+    color: #606266;
+    margin-bottom: 15px;
+    padding: 8px;
+    background-color: #f5f7fa;
+    border-radius: 4px;
+  }
+
+  &__attention {
+    color: #E6A23C;
+    font-size: 12px;
+    margin-bottom: 15px;
+  }
+
+  &__form {
+    .el-form-item {
+      margin-bottom: 8px;
+    }
+
+    .el-form-item__label {
+      font-size: 12px;
+    }
+  }
+}
+
+.required-note {
+  color: #F56C6C;
+  font-size: 12px;
 }
 </style>
