@@ -40,3 +40,4 @@ Thumbs.db
 # Server uploads
 server/uploads/*
 !server/uploads/.gitkeep
+.vercel

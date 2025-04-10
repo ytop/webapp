@@ -11,10 +11,13 @@
     "fix-deps": "./fix-dependencies.sh",
     "build": "cd client && npm run build",
     "build:prod": "cd client && npm run build:prod",
-    "lint": "cd client && npm run lint"
+    "lint": "cd client && npm run lint",
+    "vercel-build": "cd client && npm install && cross-env NODE_OPTIONS=--openssl-legacy-provider npm run build:prod",
+    "deploy": "node deploy-to-vercel.js"
   },
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",

@@ -4,8 +4,9 @@
   "description": "Express server for RDA Vue",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "vercel-build": "echo 'Building server for Vercel'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "wcl9356",

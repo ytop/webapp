@@ -1,6 +1,6 @@
 # RDA Vue Application
 
-A full-stack application with Vue.js frontend and Express.js backend.
+A full-stack application with Vue.js frontend and Express.js backend for banking Key Risk Indicator (KRI) management.
 
 ## Project Structure
 
@@ -97,6 +97,27 @@ The build output will be in the `dist` directory.
 - `GET /kri/alltasks` - Get all KRI tasks
 - `GET /kri/tasks/:id` - Get a specific KRI task
 - `POST /kri/tasks/submitValue` - Submit a KRI value
+
+## Deployment
+
+This application can be deployed to Vercel. For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
+
+### Quick Deployment
+
+To deploy the frontend to Vercel:
+
+1. Go to the Vercel dashboard and create a new project
+2. Set the root directory to `client`
+3. Set the build command to `npm run build:prod`
+4. Set the output directory to `dist`
+5. Click "Deploy"
+
+Alternatively, you can use the Vercel CLI:
+
+```bash
+cd client
+vercel
+```
 
 ## Environment Variables
 
