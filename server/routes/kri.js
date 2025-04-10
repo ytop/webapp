@@ -9,7 +9,10 @@ const {
   getKRIById,
   updateKRI,
   addDocument,
-  getDocumentsByKRIId
+  getDocumentsByKRIId,
+  getKRITasks,
+  getKRITaskById,
+  updateKRITask
 } = require('../db');
 
 // Configure multer for file uploads
@@ -40,14 +43,14 @@ router.get('/all', (req, res) => {
 router.get('/:kriId', (req, res) => {
   const { kriId } = req.params;
   const kri = getKRIById(kriId);
-  
+
   if (!kri) {
-    return res.status(404).json({ 
-      success: false, 
-      message: `KRI with ID ${kriId} not found` 
+    return res.status(404).json({
+      success: false,
+      message: `KRI with ID ${kriId} not found`
     });
   }
-  
+
   res.json(kri);
 });
 
@@ -55,16 +58,16 @@ router.get('/:kriId', (req, res) => {
 router.post('/updateDescription', (req, res) => {
   const { kriId, newDescription } = req.query;
   const kri = getKRIById(kriId);
-  
+
   if (!kri) {
-    return res.status(404).json({ 
-      success: false, 
-      message: `KRI with ID ${kriId} not found` 
+    return res.status(404).json({
+      success: false,
+      message: `KRI with ID ${kriId} not found`
     });
   }
-  
+
   const updatedKRI = updateKRI(kriId, { kriDesc: newDescription });
-  
+
   res.json({
     success: true,
     message: 'Description updated successfully',
@@ -79,18 +82,18 @@ router.post('/updateDescription', (req, res) => {
 router.post('/update', (req, res) => {
   const { kriId } = req.query;
   const kriData = req.body;
-  
+
   const kri = getKRIById(kriId);
-  
+
   if (!kri) {
-    return res.status(404).json({ 
-      success: false, 
-      message: `KRI with ID ${kriId} not found` 
+    return res.status(404).json({
+      success: false,
+      message: `KRI with ID ${kriId} not found`
     });
   }
-  
+
   const updatedKRI = updateKRI(kriId, kriData);
-  
+
   res.json({
     success: true,
     message: 'KRI updated successfully',
@@ -102,32 +105,32 @@ router.post('/update', (req, res) => {
 router.post('/uploadDocument', upload.single('file'), (req, res) => {
   const { kriId } = req.query;
   const file = req.file;
-  
+
   if (!file) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'No file uploaded' 
+    return res.status(400).json({
+      success: false,
+      message: 'No file uploaded'
     });
   }
-  
+
   const kri = getKRIById(kriId);
-  
+
   if (!kri) {
-    return res.status(404).json({ 
-      success: false, 
-      message: `KRI with ID ${kriId} not found` 
+    return res.status(404).json({
+      success: false,
+      message: `KRI with ID ${kriId} not found`
     });
   }
-  
+
   const document = {
     name: file.originalname,
     size: file.size,
     type: file.mimetype,
     url: `/uploads/${file.filename}`
   };
-  
+
   const savedDocument = addDocument(kriId, document);
-  
+
   res.json({
     success: true,
     message: 'Document uploaded successfully',
@@ -139,8 +142,79 @@ router.post('/uploadDocument', upload.single('file'), (req, res) => {
 router.get('/:kriId/documents', (req, res) => {
   const { kriId } = req.params;
   const documents = getDocumentsByKRIId(kriId);
-  
+
   res.json(documents);
+});
+
+// ===== KRI Task Routes =====
+
+// Get all KRI tasks
+router.get('/tasks', (req, res) => {
+  const tasks = getKRITasks();
+  res.json(tasks);
+});
+
+// Get a specific KRI task by ID
+router.get('/tasks/:id', (req, res) => {
+  const { id } = req.params;
+  const task = getKRITaskById(parseInt(id));
+
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      message: `KRI task with ID ${id} not found`
+    });
+  }
+
+  res.json(task);
+});
+
+// Submit a KRI value
+router.post('/tasks/submitValue', (req, res) => {
+  const kriValueData = req.body;
+  const { id } = kriValueData;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: 'Task ID is required'
+    });
+  }
+
+  const task = getKRITaskById(parseInt(id));
+
+  if (!task) {
+    return res.status(404).json({
+      success: false,
+      message: `KRI task with ID ${id} not found`
+    });
+  }
+
+  // Determine breach status based on value and thresholds
+  // This is a simplified example - in a real app, you'd compare against actual thresholds
+  let breachStatus = 'Not Determined';
+  if (kriValueData.value) {
+    const value = parseFloat(kriValueData.value);
+    if (value >= 5) {
+      breachStatus = 'Red';
+    } else if (value > 0) {
+      breachStatus = 'Yellow';
+    } else {
+      breachStatus = 'Green';
+    }
+  }
+
+  const updatedTask = updateKRITask(parseInt(id), {
+    ...kriValueData,
+    collectionStatus: 'Awaiting Approval',
+    breachStatus
+  });
+
+  res.json({
+    success: true,
+    message: 'KRI value submitted successfully',
+    updatedTask
+  });
 });
 
 module.exports = router;

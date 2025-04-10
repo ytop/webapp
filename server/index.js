@@ -6,7 +6,6 @@ const db = require('./db');
 
 // Import routes
 const kriRoutes = require('./routes/kri');
-const kriTaskRoutes = require('./routes/kriTask');
 
 // Initialize Express app
 const app = express();
@@ -23,8 +22,6 @@ app.use('/uploads', express.static(uploadsDir));
 
 // Routes
 app.use('/kri', kriRoutes);
-// Mount task routes under /kri/tasks
-app.use('/kri/tasks', kriTaskRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

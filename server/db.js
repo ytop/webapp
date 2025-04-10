@@ -8,9 +8,8 @@ const path = require('path');
 const adapter = new Memory();
 const db = low(adapter);
 
-// Import mock data from the original API files
-const { mockKRIs } = require('./data/kris');
-const { mockKriTasks } = require('./data/kriTasks');
+// Import mock data from the data file
+const { mockKRIs, mockKriTasks } = require('./data/kri');
 
 // Set default data
 db.defaults({
@@ -46,11 +45,11 @@ const addDocument = (kriId, document) => {
     ...document,
     uploadDate: new Date().toISOString()
   };
-  
+
   db.get('documents')
     .push(newDoc)
     .write();
-    
+
   // Also update the KRI's documents array
   const kri = getKRIById(kriId);
   if (kri) {
@@ -58,7 +57,7 @@ const addDocument = (kriId, document) => {
     kri.documents.push(newDoc);
     updateKRI(kriId, { documents: kri.documents });
   }
-  
+
   return newDoc;
 };
 
