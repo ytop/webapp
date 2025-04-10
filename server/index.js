@@ -28,6 +28,17 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });
 
+// Test endpoint for KRI tasks
+app.get('/test-alltasks', (req, res) => {
+  const { getKRITasks } = require('./db');
+  const tasks = getKRITasks();
+  console.log(`Test endpoint: Found ${tasks ? tasks.length : 0} KRI tasks`);
+  res.json({
+    count: tasks ? tasks.length : 0,
+    tasks: tasks || []
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

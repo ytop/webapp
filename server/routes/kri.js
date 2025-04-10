@@ -39,6 +39,14 @@ router.get('/all', (req, res) => {
   res.json(kris);
 });
 
+// Get all KRI tasks - new endpoint
+router.get('/alltasks', (req, res) => {
+  console.log('GET /kri/alltasks endpoint called');
+  const tasks = getKRITasks();
+  console.log(`Returning ${tasks ? tasks.length : 0} KRI tasks`);
+  res.json(tasks || []);
+});
+
 // Get a specific KRI by ID
 router.get('/:kriId', (req, res) => {
   const { kriId } = req.params;
@@ -148,10 +156,10 @@ router.get('/:kriId/documents', (req, res) => {
 
 // ===== KRI Task Routes =====
 
-// Get all KRI tasks
+// Get all KRI tasks (deprecated, redirects to /alltasks)
 router.get('/tasks', (req, res) => {
-  const tasks = getKRITasks();
-  res.json(tasks);
+  console.log('GET /kri/tasks endpoint called (deprecated)');
+  res.redirect('/kri/alltasks');
 });
 
 // Get a specific KRI task by ID

@@ -83,9 +83,10 @@ export const uploadKRIDocument = async (kriId, file) => {
  */
 export const getKriTasks = async () => {
   try {
-    console.log("Fetching KRI tasks");
-    const response = await axios.get(`/${process.env.VUE_APP_BACKEND_NAME}/kri/tasks`);
-    return response.data;
+    console.log("API: Fetching KRI tasks from new endpoint");
+    const response = await axios.get(`/${process.env.VUE_APP_BACKEND_NAME}/kri/alltasks`);
+    console.log("API: KRI tasks response:", response.data);
+    return response.data || [];
   } catch (error) {
     console.error('Error fetching KRI tasks:', error);
     throw error;

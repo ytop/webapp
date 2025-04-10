@@ -185,31 +185,31 @@ export default {
   computed: {
     filteredTasks() {
       let tasks = [...this.kriTaskList];
-      
+
       // Apply search filter
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase();
-        tasks = tasks.filter(task => 
-          task.name.toLowerCase().includes(query) || 
+        tasks = tasks.filter(task =>
+          task.name.toLowerCase().includes(query) ||
           task.path.toLowerCase().includes(query)
         );
       }
-      
+
       // Apply status filter
       if (this.statusFilter) {
         tasks = tasks.filter(task => task.collectionStatus === this.statusFilter);
       }
-      
+
       // Sort by requiresAttention first, then by name
       tasks.sort((a, b) => {
         if (a.requiresAttention && !b.requiresAttention) return -1;
         if (!a.requiresAttention && b.requiresAttention) return 1;
         return a.name.localeCompare(b.name);
       });
-      
+
       return tasks;
     },
-    
+
     paginatedTasks() {
       const startIndex = (this.currentPage - 1) * this.pageSize;
       return this.filteredTasks.slice(startIndex, startIndex + this.pageSize);
@@ -222,16 +222,27 @@ export default {
     async fetchKriTasks() {
       this.loading = true;
       try {
+        console.log('Component: Fetching KRI tasks');
         const tasks = await getKriTasks();
-        this.kriTaskList = tasks;
+        console.log('Component: Received KRI tasks:', tasks);
+
+        // Ensure we always have an array, even if the API returns null or undefined
+        this.kriTaskList = Array.isArray(tasks) ? tasks : [];
+
+        if (!this.kriTaskList.length) {
+          console.warn('No KRI tasks found or empty array returned');
+          this.$message.warning('No KRI tasks found');
+        } else {
+          console.log(`Successfully loaded ${this.kriTaskList.length} KRI tasks`);
+        }
       } catch (error) {
         console.error('Error fetching KRI tasks:', error);
-        this.$message.error('Failed to load KRI tasks');
+        this.$message.error(`Failed to load KRI tasks: ${error.message || 'Unknown error'}`);
       } finally {
         this.loading = false;
       }
     },
-    
+
     getStatusType(status) {
       const statusMap = {
         'Awaiting Collection': 'warning',
@@ -240,7 +251,7 @@ export default {
       };
       return statusMap[status] || '';
     },
-    
+
     getBreachStatusType(status) {
       const statusMap = {
         'Green': 'success',
@@ -249,38 +260,38 @@ export default {
       };
       return statusMap[status] || '';
     },
-    
+
     handleRowClick(row) {
       this.openValueEntryDialog(row);
     },
-    
+
     openValueEntryDialog(kri) {
       this.selectedKri = { ...kri };
       this.dialogVisible = true;
     },
-    
+
     getDialogTitle() {
       if (!this.selectedKri) return 'KRI Value Entry';
-      
+
       return `${this.selectedKri.name} - ${this.selectedKri.collectionStatus}`;
     },
-    
+
     handleValueSubmitted(updatedTask) {
       // Update the task in the list
       const index = this.kriTaskList.findIndex(task => task.id === updatedTask.id);
       if (index !== -1) {
         this.kriTaskList[index] = { ...updatedTask };
       }
-      
+
       this.dialogVisible = false;
       this.$message.success('KRI value submitted successfully');
     },
-    
+
     handleSizeChange(size) {
       this.pageSize = size;
       this.currentPage = 1;
     },
-    
+
     handleCurrentChange(page) {
       this.currentPage = page;
     }
@@ -291,23 +302,23 @@ export default {
 <style lang="scss" scoped>
 .task-container {
   padding: 20px;
-  
+
   .task-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    
+
     h2 {
       margin: 0;
     }
-    
+
     .task-filters {
       display: flex;
       align-items: center;
     }
   }
-  
+
   .pagination-container {
     margin-top: 20px;
     display: flex;
@@ -320,15 +331,15 @@ export default {
     .task-header {
       flex-direction: column;
       align-items: flex-start;
-      
+
       h2 {
         margin-bottom: 15px;
       }
-      
+
       .task-filters {
         width: 100%;
         flex-direction: column;
-        
+
         .el-input,
         .el-select {
           width: 100% !important;
@@ -337,7 +348,7 @@ export default {
         }
       }
     }
-    
+
     .pagination-container {
       justify-content: center;
     }
