@@ -142,66 +142,70 @@ export default {
   },
 
   methods: {
-    handleFileChange(file) {
-      this.fileList = this.$refs.upload.uploadFiles;
+    handleFileChange(file, fileList) {
+      this.fileList = fileList;
     },
 
-    handleFileRemove(file) {
-      this.fileList = this.$refs.upload.uploadFiles;
+    handleFileRemove(file, fileList) {
+      this.fileList = fileList;
     },
 
     beforeUpload(file) {
-      // Check file type
-      const acceptedTypes = ['application/pdf', 'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'application/vnd.ms-excel',
-                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            'image/jpeg', 'image/png'];
-      const isAcceptedType = acceptedTypes.includes(file.type);
+      const isValidType = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'image/jpeg',
+        'image/png'
+      ].includes(file.type);
 
-      // Check file size (10MB max)
-      const isLessThan10MB = file.size / 1024 / 1024 < 10;
+      const isLt10M = file.size / 1024 / 1024 < 10;
 
-      if (!isAcceptedType) {
-        this.$message.error('File type not supported');
+      if (!isValidType) {
+        this.$message.error('Invalid file type. Please upload PDF, DOC, DOCX, XLS, XLSX, JPG or PNG files.');
         return false;
       }
 
-      if (!isLessThan10MB) {
-        this.$message.error('File size cannot exceed 10MB');
+      if (!isLt10M) {
+        this.$message.error('File size cannot exceed 10MB!');
         return false;
       }
 
       return true;
     },
 
+    formatDate(dateString) {
+      if (!dateString) return '';
+      
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    },
+
     async uploadFiles() {
-      if (this.fileList.length === 0) {
-        return [];
-      }
-
+      if (this.fileList.length === 0) return [];
+      
       this.uploading = true;
-      const uploadPromises = [];
-
+      
       try {
-        for (const file of this.fileList) {
-          if (file.status !== 'success') {
-            const uploadPromise = uploadKRIDocument(this.kriId, file.raw)
-              .then(response => {
-                file.status = 'success';
-                return response.document;
-              })
-              .catch(error => {
-                file.status = 'error';
-                this.$message.error(`Failed to upload ${file.name}`);
-                console.error('Upload error:', error);
-                return null;
-              });
-
-            uploadPromises.push(uploadPromise);
+        const uploadPromises = this.fileList.map(async file => {
+          try {
+            const response = await uploadKRIDocument(this.kriId, file.raw);
+            return response.document;
+          } catch (error) {
+            console.error(`Error uploading file ${file.name}:`, error);
+            this.$message.error(`Failed to upload ${file.name}`);
+            return null;
           }
-        }
-
+        });
+        
         const uploadedDocs = await Promise.all(uploadPromises);
         const validDocs = uploadedDocs.filter(doc => doc !== null);
 
@@ -240,27 +244,17 @@ export default {
         cancelButtonText: 'No',
         type: 'warning'
       }).then(() => {
-        // In a real app, you would call an API to delete the document
-        // For now, we'll just remove it from the local array
+        // In a real application, you would call an API to delete the document
+        // For now, we'll just remove it from the local list
         const index = this.documents.findIndex(doc => doc.id === document.id);
         if (index !== -1) {
           this.documents.splice(index, 1);
-          this.$message.success('Document deleted successfully');
           this.$emit('document-deleted', document);
+          this.$message.success('Document deleted successfully');
         }
       }).catch(() => {
         // User cancelled the deletion
       });
-    },
-
-    formatDate(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      return date.toLocaleDateString();
-    },
-
-    getUploadedDocuments() {
-      return this.documents;
     }
   }
 };
@@ -268,60 +262,37 @@ export default {
 
 <style lang="scss" scoped>
 .document-upload {
-  margin-bottom: 20px;
-
   .upload-section {
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    padding: 15px;
-    margin-bottom: 25px;
-    border: 1px solid #ebeef5;
-
+    margin-bottom: 20px;
+    
     .upload-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 15px;
-
+      
       h4 {
         margin: 0;
-        color: #303133;
       }
     }
-
+    
     .upload-container {
-      background-color: white;
-      border-radius: 4px;
-      padding: 10px;
       border: 1px dashed #d9d9d9;
-
-      &:hover {
-        border-color: #409EFF;
-      }
+      border-radius: 6px;
+      padding: 10px;
+      background-color: #fafafa;
     }
   }
-
+  
   .document-list {
-    margin-top: 25px;
-
     h4 {
+      margin-top: 0;
       margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-
-      .el-tag {
-        margin-left: 10px;
-      }
     }
-
-    .el-table {
-      margin-top: 15px;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    
+    .delete-btn {
+      color: #f56c6c;
     }
-  }
-
-  .delete-btn {
-    color: #f56c6c;
   }
 }
 </style>

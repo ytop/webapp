@@ -18,34 +18,40 @@
       </div>
     </div>
 
-    <el-divider content-position="left">
-      Basic Information
-    </el-divider>
+    <!-- KRI Details Form -->
     <el-form
-      ref="kriForm"
+      ref="form"
       :model="form"
-      :rules="formRules"
-      label-width="140px"
-      size="small"
+      :rules="rules"
+      label-width="120px"
+      class="kri-form"
     >
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item
-            label="KRI ID"
-            prop="kriId"
-          >
-            <el-input
-              v-model="form.kriId"
-              disabled
-            />
-          </el-form-item>
-
-          <el-form-item
-            label="KRI Name"
-            prop="name"
-          >
-            <el-input v-model="form.name" />
-          </el-form-item>
+      <el-tabs v-model="activeTab">
+        <el-tab-pane
+          label="Basic Information"
+          name="basic"
+        >
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item
+                label="KRI ID"
+                prop="kriId"
+              >
+                <el-input
+                  v-model="form.kriId"
+                  disabled
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item
+                label="Name"
+                prop="name"
+              >
+                <el-input v-model="form.name" />
+              </el-form-item>
+            </el-col>
+          </el-row>
 
           <el-form-item
             label="Description"
@@ -54,173 +60,165 @@
             <el-input
               v-model="form.kriDesc"
               type="textarea"
-              :rows="4"
-              :maxlength="500"
-              show-word-limit
+              :rows="3"
             />
           </el-form-item>
 
-          <el-form-item
-            label="Data Provider"
-            prop="dataProvider"
-          >
-            <el-input v-model="form.dataProvider" />
-          </el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item
+                label="Data Provider"
+                prop="dataProvider"
+              >
+                <el-input v-model="form.dataProvider" />
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item
+                label="Owner"
+                prop="owner"
+              >
+                <el-input v-model="form.owner" />
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-          <el-form-item
-            label="Owner"
-            prop="owner"
-          >
-            <el-input v-model="form.owner" />
-          </el-form-item>
-        </el-col>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item
+                label="L1 Risk Type"
+                prop="l1RiskType"
+              >
+                <el-select
+                  v-model="form.l1RiskType"
+                  placeholder="Select risk type"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="type in riskTypes"
+                    :key="type"
+                    :label="type"
+                    :value="type"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item
+                label="L2 Risk Type"
+                prop="l2RiskType"
+              >
+                <el-select
+                  v-model="form.l2RiskType"
+                  placeholder="Select L2 risk type"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="type in l2RiskTypeOptions"
+                    :key="type"
+                    :label="type"
+                    :value="type"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
 
-        <el-col :span="12">
-          <el-form-item
-            label="L1 Risk Type"
-            prop="l1RiskType"
-          >
-            <el-select
-              v-model="form.l1RiskType"
-              placeholder="Select L1 Risk Type"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="type in riskTypes"
-                :key="type"
-                :label="type"
-                :value="type"
-              />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item
-            label="L2 Risk Type"
-            prop="l2RiskType"
-          >
-            <el-select
-              v-model="form.l2RiskType"
-              placeholder="Select L2 Risk Type"
-              style="width: 100%"
-              :disabled="!form.l1RiskType"
-            >
-              <el-option
-                v-for="type in l2RiskTypeOptions"
-                :key="type"
-                :label="type"
-                :value="type"
-              />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item
-            label="Report Cycle"
-            prop="reportCycle"
-          >
-            <el-select
-              v-model="form.reportCycle"
-              placeholder="Select Report Cycle"
-              style="width: 100%"
-            >
-              <el-option
-                label="Daily"
-                value="Daily"
-              />
-              <el-option
-                label="Weekly"
-                value="Weekly"
-              />
-              <el-option
-                label="Monthly"
-                value="Monthly"
-              />
-              <el-option
-                label="Quarterly"
-                value="Quarterly"
-              />
-            </el-select>
-          </el-form-item>
-
-          <el-form-item
-            label="RAS Status"
-            prop="rasStatus"
-          >
-            <el-radio-group v-model="form.rasStatus">
-              <el-radio label="RAS">
-                RAS
-              </el-radio>
-              <el-radio label="Non-RAS">
-                Non-RAS
-              </el-radio>
-            </el-radio-group>
-          </el-form-item>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <el-form-item
+                label="Report Cycle"
+                prop="reportCycle"
+              >
+                <el-select
+                  v-model="form.reportCycle"
+                  placeholder="Select report cycle"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="cycle in reportCycles"
+                    :key="cycle"
+                    :label="cycle"
+                    :value="cycle"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item
+                label="RAS Status"
+                prop="rasStatus"
+              >
+                <el-select
+                  v-model="form.rasStatus"
+                  placeholder="Select RAS status"
+                  style="width: 100%"
+                >
+                  <el-option
+                    label="RAS"
+                    value="RAS"
+                  />
+                  <el-option
+                    label="Non-RAS"
+                    value="Non-RAS"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
 
           <el-form-item
             label="Status"
             prop="status"
           >
-            <el-select
-              v-model="form.status"
-              placeholder="Select Status"
-              style="width: 100%"
-            >
-              <el-option
-                label="Active"
-                value="Active"
-              />
-              <el-option
-                label="Inactive"
-                value="Inactive"
-              />
-            </el-select>
+            <el-radio-group v-model="form.status">
+              <el-radio label="Active">
+                Active
+              </el-radio>
+              <el-radio label="Inactive">
+                Inactive
+              </el-radio>
+            </el-radio-group>
           </el-form-item>
-        </el-col>
-      </el-row>
+        </el-tab-pane>
 
-      <el-divider content-position="left">
-        Thresholds
-      </el-divider>
-
-      <el-row :gutter="20">
-        <el-col :span="12">
+        <el-tab-pane
+          label="Thresholds"
+          name="thresholds"
+        >
           <el-form-item
             label="Yellow Threshold"
             prop="yellowThreshold"
           >
             <el-input-number
               v-model="form.yellowThreshold"
+              :min="0"
               :precision="2"
               :step="1"
-              :min="0"
-              style="width: 100%"
+              style="width: 200px"
             />
           </el-form-item>
-        </el-col>
 
-        <el-col :span="12">
           <el-form-item
             label="Red Threshold"
             prop="redThreshold"
           >
             <el-input-number
               v-model="form.redThreshold"
+              :min="0"
               :precision="2"
               :step="1"
-              :min="0"
-              style="width: 100%"
+              style="width: 200px"
             />
           </el-form-item>
-        </el-col>
-      </el-row>
+        </el-tab-pane>
+      </el-tabs>
     </el-form>
 
-    <!-- Documents Section at the bottom -->
-    <el-divider content-position="left">
-      Documents
-    </el-divider>
-
-    <div class="documents-section">
+    <!-- Document Management Section at the bottom -->
+    <div class="document-section">
       <kri-document-upload
+        v-if="form.kriId"
         ref="documentUpload"
         :kri-id="form.kriId"
         :existing-documents="form.documents"
@@ -274,11 +272,7 @@ export default {
 
   data() {
     return {
-
-      submitting: false,
-      workflowActionSelected: false,
-
-      // Form data
+      activeTab: 'basic',
       form: {
         kriId: '',
         name: '',
@@ -288,23 +282,19 @@ export default {
         l1RiskType: '',
         l2RiskType: '',
         reportCycle: '',
-        rasStatus: 'RAS',
+        rasStatus: '',
         status: 'Active',
         yellowThreshold: 0,
         redThreshold: 0,
         documents: [],
         workflowStatus: 'Draft'
       },
-
-      // Form validation rules
-      formRules: {
+      rules: {
         name: [
-          { required: true, message: 'Please enter KRI name', trigger: 'blur' },
-          { min: 3, max: 100, message: 'Length should be 3 to 100 characters', trigger: 'blur' }
+          { required: true, message: 'Please enter KRI name', trigger: 'blur' }
         ],
         kriDesc: [
-          { required: true, message: 'Please enter KRI description', trigger: 'blur' },
-          { min: 3, max: 500, message: 'Length should be 3 to 500 characters', trigger: 'blur' }
+          { required: true, message: 'Please enter KRI description', trigger: 'blur' }
         ],
         dataProvider: [
           { required: true, message: 'Please enter data provider', trigger: 'blur' }
@@ -320,13 +310,13 @@ export default {
         ],
         reportCycle: [
           { required: true, message: 'Please select report cycle', trigger: 'change' }
+        ],
+        rasStatus: [
+          { required: true, message: 'Please select RAS status', trigger: 'change' }
         ]
       },
-
-      // Risk type options
       riskTypes: ['Credit Risk', 'Market Risk', 'Operational Risk', 'Liquidity Risk', 'Compliance Risk', 'Technology Risk', 'Strategic Risk'],
-
-      l2RiskTypesMap: {
+      l2RiskTypeMap: {
         'Credit Risk': ['Default Risk', 'Concentration Risk', 'Country Risk', 'Settlement Risk'],
         'Market Risk': ['Interest Rate Risk', 'Foreign Exchange Risk', 'Commodity Risk', 'Equity Risk'],
         'Operational Risk': ['Process Risk', 'People Risk', 'System Risk', 'External Events'],
@@ -334,38 +324,38 @@ export default {
         'Compliance Risk': ['Regulatory Risk', 'Legal Risk', 'Conduct Risk', 'Financial Crime Risk'],
         'Technology Risk': ['Cybersecurity Risk', 'Data Integrity Risk', 'System Availability Risk', 'IT Change Risk'],
         'Strategic Risk': ['Business Model Risk', 'Reputation Risk', 'Macroeconomic Risk', 'Competition Risk']
-      }
+      },
+      reportCycles: ['Daily', 'Weekly', 'Monthly', 'Quarterly'],
+      submitting: false,
+      workflowActionSelected: false
     };
   },
 
   computed: {
     l2RiskTypeOptions() {
-      return this.form.l1RiskType ? this.l2RiskTypesMap[this.form.l1RiskType] || [] : [];
+      return this.form.l1RiskType ? this.l2RiskTypeMap[this.form.l1RiskType] || [] : [];
     }
   },
 
   watch: {
-
     kriData: {
       immediate: true,
       handler(newData) {
-        console.log('KRIEditDialog - kriData prop changed:', newData);
         if (newData && Object.keys(newData).length > 0) {
           this.initializeForm(newData);
         }
       }
+    },
+    'form.l1RiskType'(newValue) {
+      // Reset L2 risk type when L1 changes
+      if (newValue && (!this.form.l2RiskType || !this.l2RiskTypeOptions.includes(this.form.l2RiskType))) {
+        this.form.l2RiskType = '';
+      }
     }
-  },
-
-  mounted() {
-    console.log('KRIEditDialog mounted - kriData:', this.kriData);
-    console.log('KRIEditDialog mounted - form:', this.form);
-    console.log('KRIEditDialog mounted - form.workflowStatus:', this.form.workflowStatus);
   },
 
   methods: {
     initializeForm(data) {
-      // Initialize form with KRI data
       this.form = {
         kriId: data.kriId || '',
         name: data.name || '',
@@ -375,30 +365,59 @@ export default {
         l1RiskType: data.l1RiskType || '',
         l2RiskType: data.l2RiskType || '',
         reportCycle: data.reportCycle || '',
-        rasStatus: data.rasStatus || 'RAS',
+        rasStatus: data.rasStatus || '',
         status: data.status || 'Active',
-        yellowThreshold: (data.threshold && data.threshold.yellow) || 0,
-        redThreshold: (data.threshold && data.threshold.red) || 0,
+        yellowThreshold: data.threshold?.yellow || 0,
+        redThreshold: data.threshold?.red || 0,
         documents: data.documents || [],
         workflowStatus: data.workflowStatus || 'Draft'
       };
     },
 
     handleClose() {
-      this.workflowActionSelected = false;
+      this.$emit('close');
+    },
+
+    handleActionSelected(selected) {
+      this.workflowActionSelected = selected;
+    },
+
+    async submitWorkflow() {
+      if (!this.$refs.workflowStatus) return;
+
+      this.submitting = true;
+      try {
+        const workflowData = this.$refs.workflowStatus.getWorkflowData();
+        console.log('Submitting workflow action:', workflowData);
+
+        // Update the KRI with the new workflow status
+        const kriData = {
+          ...this.form,
+          workflowStatus: workflowData.newStatus,
+          threshold: {
+            yellow: this.form.yellowThreshold,
+            red: this.form.redThreshold
+          }
+        };
+
+        const response = await updateKRI(this.form.kriId, kriData);
+
+        this.$message.success(`Workflow action submitted successfully. New status: ${workflowData.newStatus}`);
+        this.$emit('kri-updated', response.updatedKRI);
+        this.handleClose();
+      } catch (error) {
+        this.$message.error('Failed to submit workflow action');
+        console.error('Error submitting workflow action:', error);
+      } finally {
+        this.submitting = false;
+      }
     },
 
     async saveKRI() {
       try {
-        await this.$refs.kriForm.validate();
-      } catch (error) {
-        this.$message.error('Please fix the form errors before saving');
-        return;
-      }
+        await this.$refs.form.validate();
+        this.submitting = true;
 
-      this.submitting = true;
-
-      try {
         // Upload any pending documents
         let uploadedDocs = [];
         if (this.$refs.documentUpload) {
@@ -450,45 +469,6 @@ export default {
     handleWorkflowUpdate(workflowData) {
       this.form.workflowStatus = workflowData.newStatus;
       this.$message.success(`Workflow status updated to ${workflowData.newStatus}`);
-    },
-
-    handleActionSelected() {
-      this.workflowActionSelected = true;
-    },
-
-    async submitWorkflow() {
-      if (!this.$refs.workflowStatus) {
-        this.$message.error('Workflow component not initialized');
-        return;
-      }
-
-      const workflowResult = this.$refs.workflowStatus.submitAction();
-      if (!workflowResult) {
-        return;
-      }
-
-      this.submitting = true;
-
-      try {
-        // Update the KRI with the new workflow status
-        const kriData = {
-          ...this.kriData,
-          workflowStatus: workflowResult.newStatus,
-          lastUpdated: new Date().toISOString()
-        };
-
-        // Call the API to update the KRI
-        const response = await updateKRI(this.form.kriId, kriData);
-
-        this.$message.success(`Workflow action submitted successfully. New status: ${workflowResult.newStatus}`);
-        this.$emit('kri-updated', response.updatedKRI);
-        this.workflowActionSelected = false;
-      } catch (error) {
-        this.$message.error('Failed to submit workflow action');
-        console.error('Error submitting workflow action:', error);
-      } finally {
-        this.submitting = false;
-      }
     }
   }
 };
@@ -497,53 +477,40 @@ export default {
 <style lang="scss" scoped>
 .kri-edit-dialog {
   .workflow-section {
-    margin-bottom: 30px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 4px;
-    border-left: 4px solid #409EFF;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ebeef5;
 
     h3 {
       margin-top: 0;
       margin-bottom: 15px;
-      color: #303133;
-      font-size: 18px;
-    }
-
-    .loading-placeholder {
-      padding: 20px;
-      text-align: center;
-      color: #909399;
-      font-size: 14px;
-
-      i {
-        margin-right: 5px;
-        font-size: 16px;
-        color: #409EFF;
-      }
+      font-size: 16px;
+      font-weight: 500;
     }
   }
 
-  .documents-section {
+  .kri-form {
+    margin-bottom: 20px;
+  }
+
+  .document-section {
     margin-top: 20px;
-    margin-bottom: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ebeef5;
   }
 
-  .el-divider {
-    margin: 30px 0;
-    font-weight: bold;
-    color: #303133;
-    font-size: 16px;
-  }
-
-  .el-form {
-    margin-bottom: 30px;
+  .loading-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    color: #909399;
   }
 
   .dialog-footer {
     display: block;
-    margin-top: 20px;
     text-align: right;
+    margin-top: 20px;
   }
 }
 </style>

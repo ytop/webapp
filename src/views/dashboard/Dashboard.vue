@@ -126,9 +126,15 @@
             />
             <el-table-column
               prop="attestationsQuestions"
-              label="Attestations"
+              label="Attestations Questions"
               sortable="custom"
-              width="120"
+              width="180"
+            />
+            <el-table-column
+              prop="nonCompliance"
+              label="Non-Compliance"
+              sortable="custom"
+              width="140"
             />
             <el-table-column
               prop="kriCount"
@@ -191,7 +197,7 @@
               :total="totalItems"
               layout="total, sizes, prev, pager, next, jumper"
               @size-change="handleSizeChange"
-              @current-change="handleCurrentChange"
+              @current-change="handlePageChange"
             />
           </div>
         </el-card>
@@ -245,11 +251,11 @@
 </template>
 
 <script>
-import HealthScoreGauge from '@/components/dashboard/HealthScoreGauge.vue';
-import KpiCard from '@/components/dashboard/KpiCard.vue';
+import HealthScoreGauge from './HealthScoreGauge.vue';
+import KpiCard from './KpiCard.vue';
 
 export default {
-  name: 'DashboardComponent',
+  name: 'Dashboard',
   components: {HealthScoreGauge, KpiCard},
   data() {
     return {
@@ -261,24 +267,12 @@ export default {
         {color: '#f56c6c', percentage: 100} // Red
       ],
       categoryScores: [
-        {
-          name: 'Risks',
-          score: 3,
-          description: 'Improve your risks health score by ensuring your risk assessments are up to date.'
-        },
-        {name: 'Controls', score: 1.2, description: 'Improve your controls health score by reviewing controls.'},
-        {
-          name: 'Attestations',
-          score: 5,
-          description: 'Improve your attestations health score by providing responses on time.'
-        },
-        {name: 'Actions', score: 1.9, description: 'Improve your action health score by closing actions.'},
-        {
-          name: 'Audit Findings',
-          score: 0.1,
-          description: 'Improve your audit findings health score by closing findings.'
-        },
-        {name: 'Incidents', score: 2, description: 'Improve health score by reducing the number of incidents.'},
+        {name: 'Credit', score: 3.5, description: 'Credit risk is well managed with some areas for improvement'},
+        {name: 'Market', score: 4.2, description: 'Market risk controls are effective'},
+        {name: 'Operational', score: 2.8, description: 'Operational risk requires attention'},
+        {name: 'Liquidity', score: 3.9, description: 'Liquidity risk is adequately managed'},
+        {name: 'Compliance', score: 1.7, description: 'Compliance risk needs immediate attention'},
+        {name: 'Strategic', score: 3.1, description: 'Strategic risk is within acceptable levels'}
       ],
       businessUnitData: [
         {
@@ -321,36 +315,17 @@ export default {
         },
         {
           unit: 'Finance',
-          score: 4.4,
-          inherent: 'Moderate',
-          residual: 'Moderate',
-          activeControls: '',
-          reviewedLast12: '',
-          controlsTotal: '',
-          attestationsQuestions: '',
-          nonCompliance: '',
-          kriCount: 77,
-          kriRed: 7,
-          actionsOpen: 25,
-          actionsOverdue: 25,
-          auditFindings: '',
-          auditOverdue: '',
-          incidents: '',
-          estimatedLoss: ''
-        },
-        {
-          unit: 'Health and Safety',
-          score: 5,
+          score: 4.5,
           inherent: 'High',
-          residual: 'Moderate',
-          activeControls: '',
-          reviewedLast12: '',
-          controlsTotal: '',
-          attestationsQuestions: '',
+          residual: 'Low',
+          activeControls: 3,
+          reviewedLast12: 2,
+          controlsTotal: 12,
+          attestationsQuestions: 44,
           nonCompliance: '',
-          kriCount: 33,
-          kriRed: 5,
-          actionsOpen: 15,
+          kriCount: 6,
+          kriRed: '',
+          actionsOpen: 2,
           actionsOverdue: '',
           auditFindings: '',
           auditOverdue: '',
@@ -397,41 +372,22 @@ export default {
         },
         {
           unit: 'Operations',
-          score: 3.3,
-          inherent: 'High',
-          residual: 'Low',
-          activeControls: '',
-          reviewedLast12: '',
-          controlsTotal: '',
-          attestationsQuestions: 122,
-          nonCompliance: '',
-          kriCount: 10,
-          kriRed: 5,
-          actionsOpen: 5,
-          actionsOverdue: '',
-          auditFindings: '',
-          auditOverdue: '',
-          incidents: 1,
-          estimatedLoss: ''
-        },
-        {
-          unit: 'People & Culture',
-          score: 0.7,
+          score: 3.8,
           inherent: 'High',
           residual: 'Moderate',
-          activeControls: '',
-          reviewedLast12: '',
-          controlsTotal: 73,
-          attestationsQuestions: 99,
+          activeControls: 2,
+          reviewedLast12: 1,
+          controlsTotal: 32,
+          attestationsQuestions: 22,
           nonCompliance: '',
-          kriCount: 9,
-          kriRed: 9,
-          actionsOpen: 5,
-          actionsOverdue: '',
-          auditFindings: '',
-          auditOverdue: '',
-          incidents: '',
-          estimatedLoss: ''
+          kriCount: 8,
+          kriRed: 2,
+          actionsOpen: 2,
+          actionsOverdue: 1,
+          auditFindings: 1,
+          auditOverdue: 1,
+          incidents: 1,
+          estimatedLoss: 139000
         },
         {
           unit: 'Product',
@@ -520,170 +476,146 @@ export default {
   },
   computed: {
     filteredBusinessUnitData() {
-      let filtered = this.tableSearch
-          ? this.businessUnitData.filter(item =>
-              item.unit.toLowerCase().includes(this.tableSearch.toLowerCase()))
-          : this.businessUnitData;
-
-      return [...filtered].sort((a, b) => {
-        const aValue = a[this.sortBy] !== undefined ? a[this.sortBy] : '';
-        const bValue = b[this.sortBy] !== undefined ? b[this.sortBy] : '';
-
-        if (!isNaN(aValue) && !isNaN(bValue)) {
-          return this.sortOrder === 'ascending'
-              ? Number(aValue) - Number(bValue)
-              : Number(bValue) - Number(aValue);
+      let data = [...this.businessUnitData];
+      
+      // Apply search filter
+      if (this.tableSearch) {
+        const search = this.tableSearch.toLowerCase();
+        data = data.filter(item => 
+          item.unit.toLowerCase().includes(search)
+        );
+      }
+      
+      // Apply sorting
+      data.sort((a, b) => {
+        const aValue = a[this.sortBy];
+        const bValue = b[this.sortBy];
+        
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return this.sortOrder === 'ascending' 
+            ? aValue.localeCompare(bValue) 
+            : bValue.localeCompare(aValue);
+        } else {
+          // Handle numeric or empty values
+          const aNum = aValue === '' ? -Infinity : Number(aValue);
+          const bNum = bValue === '' ? -Infinity : Number(bValue);
+          
+          return this.sortOrder === 'ascending' ? aNum - bNum : bNum - aNum;
         }
-        return this.sortOrder === 'ascending'
-            ? String(aValue).localeCompare(String(bValue))
-            : String(bValue).localeCompare(String(aValue));
-      }).slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize);
+      });
+      
+      return data;
     },
+    
     totalItems() {
-      return this.tableSearch
-          ? this.businessUnitData.filter(item =>
-              item.unit.toLowerCase().includes(this.tableSearch.toLowerCase())).length
-          : this.businessUnitData.length;
+      return this.filteredBusinessUnitData.length;
+    },
+    
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return this.filteredBusinessUnitData.slice(start, end);
     }
   },
-  mounted() {
-    this.loadData();
-  },
   methods: {
-    formatCurrency(value) {
-      return value || value === 0 ? `$ ${Number(value).toLocaleString()}` : '';
+    getScoreColor(score) {
+      if (score >= 4) return '#67C23A'; // Green
+      if (score >= 3) return '#E6A23C'; // Yellow
+      if (score >= 2) return '#F56C6C'; // Red
+      return '#909399'; // Gray for 0-1 or no score
     },
-    handleSizeChange(size) {
-      this.pageSize = size;
-    },
-    handleCurrentChange(page) {
-      this.currentPage = page;
-    },
-    handleSortChange({prop, order}) {
+    
+    handleSortChange({ prop, order }) {
       this.sortBy = prop;
       this.sortOrder = order;
     },
-    loadData() {
-      this.tableLoading = true;
-      setTimeout(() => (this.tableLoading = false), 500);
+    
+    handleSizeChange(size) {
+      this.pageSize = size;
+      this.currentPage = 1;
     },
-    getScoreColor(score) {
-      // Ensure score is between 0 and 5
-      const normalizedScore = Math.max(0, Math.min(5, score));
-      
-      if (normalizedScore >= 3.75) {
-        return '#67C23A'; // Strong Green
-      } else if (normalizedScore >= 2.5) {
-        return '#E6A23C'; // Yellow
-      } else if (normalizedScore >= 1.25) {
-        return '#F56C6C'; // Light Red
-      } else {
-        return '#FF4949'; // Strong Red
-      }
-    },
-    getRatingTagType(rating) {
-      // Add console.log to debug the incoming value
-      console.log('Rating value:', rating);
-      
-      if (!rating) return 'info';
-      
-      // Convert to lowercase and trim any whitespace
-      const normalizedRating = rating.toLowerCase().trim();
-      
-      switch (normalizedRating) {
-        case 'high':
-          return 'danger';
-        case 'moderate':
-          return 'warning';
-        case 'low':
-          return 'success';
-        default:
-          return 'info';
-      }
+    
+    handlePageChange(page) {
+      this.currentPage = page;
     }
   }
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .dashboard {
-  padding: 0 10px;
-}
-
-.dashboard__title {
-  margin-bottom: 10px;
-}
-
-.dashboard__date-range {
-  color: grey;
-  margin-bottom: 20px;
-}
-
-.dashboard__row {
-  margin-bottom: 20px;
-}
-
-.dashboard__card {
-  margin-bottom: 20px;
-}
-
-.dashboard__filters-card {
-  position: sticky;
-  top: 20px;
-}
-
-.dashboard__card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.dashboard__filters {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.dashboard__filter-tag {
-  width: 100%;
-  text-align: left;
-}
-
-.dashboard__filter-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.dashboard__search-input {
-  width: 100%;
-}
-
-.dashboard__table {
-  width: 100%;
-}
-
-.dashboard__pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-  .dashboard__filters-card {
-    position: static;
+  &__title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 500;
+  }
+  
+  &__date-range {
+    font-size: 16px;
+    font-weight: normal;
+    color: #909399;
+    margin-left: 10px;
+  }
+  
+  &__row {
     margin-bottom: 20px;
   }
-
-  .dashboard__card-header {
-    flex-direction: column;
-    align-items: flex-start;
+  
+  &__card {
+    margin-bottom: 20px;
+    
+    &-header {
+      font-weight: 500;
+    }
   }
-
-  .dashboard__filter-controls {
-    margin-top: 10px;
+  
+  &__table {
+    margin-bottom: 15px;
+  }
+  
+  &__pagination {
+    text-align: right;
+  }
+  
+  &__filters-card {
+    height: 100%;
+  }
+  
+  &__filter-controls {
+    margin-bottom: 15px;
+  }
+  
+  &__search-input {
     width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  &__filter-tag {
+    margin-bottom: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .dashboard {
+    &__title {
+      font-size: 20px;
+    }
+    
+    &__date-range {
+      display: block;
+      margin-left: 0;
+      margin-top: 5px;
+    }
+    
+    &__pagination {
+      text-align: center;
+    }
   }
 }
 </style>

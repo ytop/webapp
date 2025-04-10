@@ -140,13 +140,13 @@
       <el-table-column
         prop="rasStatus"
         label="RAS Status"
-        min-width="120"
+        width="120"
         sortable="custom"
       >
         <template slot-scope="scope">
           <el-tag
             :type="scope.row.rasStatus === 'RAS' ? 'success' : 'info'"
-            size="small"
+            size="medium"
           >
             {{ scope.row.rasStatus }}
           </el-tag>
@@ -161,16 +161,16 @@
         <template slot-scope="scope">
           <el-tag
             :type="getWorkflowStatusType(scope.row.workflowStatus)"
-            size="small"
+            size="medium"
           >
             {{ scope.row.workflowStatus }}
           </el-tag>
         </template>
       </el-table-column>
       <el-table-column
-        fixed="right"
         label="Actions"
-        width="120"
+        width="100"
+        fixed="right"
         align="center"
       >
         <template slot-scope="scope">
@@ -222,10 +222,10 @@
 <script>
 import { getKRIs } from '@/api/kri'
 import debounce from 'lodash/debounce'
-import KRIEditDialog from '@/components/KRIEditDialog.vue'
+import KRIEditDialog from './KRIEditDialog.vue'
 
 export default {
-  name: 'KRIInventoryComponent',
+  name: 'InventoryView',
 
   components: {
     'kri-edit-dialog': KRIEditDialog
@@ -250,17 +250,16 @@ export default {
 
   computed: {
     filteredKRIList() {
-      let filtered = this.kriList;
+      let filtered = [...this.kriList];
 
       // Apply search filter
       if (this.searchQuery) {
         const query = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(kri =>
+        filtered = filtered.filter(kri => 
           kri.kriId.toLowerCase().includes(query) ||
           kri.name.toLowerCase().includes(query) ||
-          kri.kriDesc.toLowerCase().includes(query) ||
-          kri.owner.toLowerCase().includes(query) ||
-          kri.dataProvider.toLowerCase().includes(query)
+          kri.dataProvider.toLowerCase().includes(query) ||
+          kri.owner.toLowerCase().includes(query)
         );
       }
 
@@ -274,65 +273,75 @@ export default {
         filtered = filtered.filter(kri => kri.rasStatus === this.filterRasStatus);
       }
 
-      return this.sortData(filtered);
-    },
-
-    sortedData() {
-      return this.sortData(this.kriList);
+      return filtered;
     },
 
     paginatedData() {
-      const startIndex = (this.currentPage - 1) * this.pageSize;
-      const endIndex = startIndex + this.pageSize;
-      return this.filteredKRIList.slice(startIndex, endIndex);
+      // Apply sorting
+      const sorted = [...this.filteredKRIList].sort((a, b) => {
+        const aValue = a[this.sortBy];
+        const bValue = b[this.sortBy];
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return this.sortOrder === 'ascending' 
+            ? aValue.localeCompare(bValue) 
+            : bValue.localeCompare(aValue);
+        } else {
+          return this.sortOrder === 'ascending' 
+            ? aValue - bValue 
+            : bValue - aValue;
+        }
+      });
+
+      // Apply pagination
+      const start = (this.currentPage - 1) * this.pageSize;
+      const end = start + this.pageSize;
+      return sorted.slice(start, end);
     }
   },
 
   created() {
+    this.debouncedSearch = debounce(this.handleFilterChange, 300);
     this.fetchKRIs();
-    // Debounce search for better performance
-    this.debouncedSearch = debounce(() => {
-      // Reset to first page when searching
-      this.currentPage = 1;
-    }, 300);
-  },
-
-  beforeDestroy() {
-    // Clean up debounced function
-    this.debouncedSearch.cancel();
   },
 
   methods: {
     async fetchKRIs() {
       this.loading = true;
       try {
-        const response = await getKRIs();
-        this.kriList = response;
+        const data = await getKRIs();
+        this.kriList = data;
       } catch (error) {
-        this.$message.error('Failed to fetch KRI data');
         console.error('Error fetching KRIs:', error);
+        this.$message.error('Failed to load KRIs');
       } finally {
         this.loading = false;
       }
     },
 
-    sortData(data) {
-      if (!this.sortBy) return data;
+    handleSortChange({ prop, order }) {
+      this.sortBy = prop;
+      this.sortOrder = order;
+    },
 
-      return [...data].sort((a, b) => {
-        const aValue = a[this.sortBy];
-        const bValue = b[this.sortBy];
+    handleSizeChange(size) {
+      this.pageSize = size;
+      this.currentPage = 1;
+    },
 
-        if (this.sortOrder === 'ascending') {
-          return typeof aValue === 'string' && typeof bValue === 'string'
-            ? aValue.localeCompare(bValue)
-            : aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
-        } else {
-          return typeof aValue === 'string' && typeof bValue === 'string'
-            ? bValue.localeCompare(aValue)
-            : bValue > aValue ? 1 : bValue < aValue ? -1 : 0;
-        }
-      });
+    handleCurrentChange(page) {
+      this.currentPage = page;
+    },
+
+    getWorkflowStatusType(status) {
+      const statusMap = {
+        'Draft': 'info',
+        'Pending Review': 'warning',
+        'Under Review': 'warning',
+        'Approved': 'success',
+        'Rejected': 'danger'
+      };
+      return statusMap[status] || 'info';
     },
 
     handleRowClick(row) {
@@ -366,36 +375,6 @@ export default {
 
     handleFilterChange() {
       this.currentPage = 1;
-    },
-
-    handleSortChange({ prop, order }) {
-      if (prop) {
-        this.sortBy = prop;
-        this.sortOrder = order || 'ascending';
-      } else {
-        this.sortBy = 'kriId';
-        this.sortOrder = 'ascending';
-      }
-    },
-
-    handleSizeChange(size) {
-      this.pageSize = size;
-      this.currentPage = 1;
-    },
-
-    handleCurrentChange(page) {
-      this.currentPage = page;
-    },
-
-    getWorkflowStatusType(status) {
-      const typeMap = {
-        'Draft': 'info',
-        'Pending Review': 'warning',
-        'Under Review': 'warning',
-        'Approved': 'success',
-        'Rejected': 'danger'
-      };
-      return typeMap[status] || 'info';
     }
   }
 }

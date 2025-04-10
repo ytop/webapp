@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import KRIManagement from './components/KRIManagement.vue'
+import KRIManagement from './views/KRIManagement.vue'
 
 Vue.use(Router)
 
@@ -8,7 +8,7 @@ Vue.use(Router)
 const router = new Router({
   mode: 'history',
   base: process.env.VUE_APP_PROXY,
-  routes: [ // Fix typo from 'routers' to 'routes'
+  routes: [
     {
       path: '/',
       name: 'KRIManagement',

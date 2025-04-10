@@ -27,13 +27,13 @@
 </template>
 
 <script>
-// Import child components
-import Dashboard from './tabs/DashBoard.vue';
-import Task from './tabs/Task.vue';
-import Inventory from './tabs/KRIInventory.vue';
+// Import child components from views subdirectories
+import Dashboard from './dashboard/Dashboard.vue';
+import Task from './task/Task.vue';
+import Inventory from './inventory/Inventory.vue';
 
 export default {
-  name: 'App',
+  name: 'KRIManagement',
   components: {
     Dashboard,
     Task,
@@ -60,4 +60,3 @@ export default {
   margin-bottom: 20px;
 }
 </style>
-

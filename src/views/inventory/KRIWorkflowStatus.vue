@@ -30,7 +30,7 @@
       <el-step title="Approved/Rejected">
         <template slot="icon">
           <div :class="['custom-step-icon', { active: currentStatus === 'Approved' || currentStatus === 'Rejected' }]">
-            <i :class="currentStatus === 'Approved' ? 'el-icon-check' : (currentStatus === 'Rejected' ? 'el-icon-close' : 'el-icon-finished')" />
+            <i :class="currentStatus === 'Rejected' ? 'el-icon-close' : 'el-icon-check'" />
           </div>
         </template>
       </el-step>
@@ -52,6 +52,7 @@
                 v-model="selectedAction"
                 placeholder="Select action"
                 :disabled="!canTakeAction"
+                @change="handleActionChange"
               >
                 <el-option
                   v-for="action in availableActions"
@@ -160,46 +161,30 @@ export default {
         this.selectedAction = '';
         this.comments = '';
       }
-    },
-
-    selectedAction(newAction) {
-      if (newAction) {
-        this.$emit('action-selected', {
-          action: newAction,
-          currentStatus: this.currentStatus
-        });
-      }
     }
-  },
-
-  mounted() {
-    console.log('KRIWorkflowStatus mounted - status prop:', this.status);
-    console.log('KRIWorkflowStatus mounted - currentStatus:', this.currentStatus);
-    console.log('KRIWorkflowStatus mounted - activeStep:', this.activeStep);
-    console.log('KRIWorkflowStatus mounted - availableActions:', this.availableActions);
   },
 
   methods: {
     getStatusType(status) {
-      const typeMap = {
+      const statusMap = {
         'Draft': 'info',
         'Pending Review': 'warning',
         'Under Review': 'warning',
         'Approved': 'success',
         'Rejected': 'danger'
       };
-      return typeMap[status] || 'info';
+      return statusMap[status] || 'info';
     },
 
-    submitAction() {
-      if (!this.selectedAction) {
-        this.$message.warning('Please select an action');
-        return null;
-      }
+    handleActionChange() {
+      // Emit event to parent component
+      this.$emit('action-selected', !!this.selectedAction);
+    },
 
+    getWorkflowData() {
       // Determine the new status based on the selected action
       let newStatus = this.currentStatus;
-
+      
       switch (this.selectedAction) {
         case 'submit':
           newStatus = 'Pending Review';
@@ -223,24 +208,26 @@ export default {
           newStatus = 'Draft';
           break;
       }
-
-      // Update the current status
-      this.currentStatus = newStatus;
-
-      // Return the workflow data
-      const result = {
-        ...this.workflowData,
-        newStatus
+      
+      return {
+        previousStatus: this.currentStatus,
+        newStatus,
+        action: this.selectedAction,
+        comments: this.comments,
+        timestamp: new Date().toISOString()
       };
+    },
 
-      // Reset the form
+    updateStatus(newStatus) {
+      this.currentStatus = newStatus;
       this.selectedAction = '';
       this.comments = '';
-
-      // Emit the event
-      this.$emit('workflow-updated', result);
-
-      return result;
+      
+      this.$emit('workflow-updated', {
+        previousStatus: this.status,
+        newStatus,
+        timestamp: new Date().toISOString()
+      });
     }
   }
 };
@@ -248,73 +235,26 @@ export default {
 
 <style lang="scss" scoped>
 .workflow-status {
-  margin-bottom: 20px;
-
-  .el-steps {
-    margin-bottom: 30px;
-  }
-
   .custom-step-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background-color: #f5f7fa;
-    color: #909399;
-    transition: all 0.3s;
-
+    background-color: #c0c4cc;
+    color: #fff;
+    
     &.active {
-      background-color: #409EFF;
-      color: white;
-      transform: scale(1.2);
-      box-shadow: 0 0 10px rgba(64, 158, 255, 0.5);
-    }
-
-    i {
-      font-size: 16px;
+      background-color: #409eff;
     }
   }
-
+  
   .workflow-actions {
     margin-top: 30px;
-    padding: 0 20px;  /* Changed from padding: 20px to only have horizontal padding */
-    background-color: #f8f8f8;
+    padding: 20px;
+    background-color: #f5f7fa;
     border-radius: 4px;
-    border: 1px solid #ebeef5;
-  }
-
-  .el-tag {
-    font-size: 14px;
-    padding: 6px 12px;
-  }
-
-  .el-select {
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .el-form-item {
-    margin-bottom: 20px;
-  }
-
-  /* Form element styles */
-  ::v-deep .el-form-item__label {
-    line-height: 40px;
-    font-size: 14px;
-  }
-
-  ::v-deep .el-form-item__content {
-    line-height: 40px;
-  }
-
-  ::v-deep .el-step__title {
-    font-size: 14px;
-  }
-
-  ::v-deep .el-step__head {
-    padding-right: 10px;
   }
 }
 </style>
