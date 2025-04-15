@@ -9,7 +9,7 @@ import axios from 'axios';
  * @returns {Promise} Promise that resolves to an array of KRIs
  */
 export const getKRIs = async () => {
-    console.log("Fetching KRIs");
+    console.log("Fetching KRIs " +  `/${process.env.VUE_APP_BACKEND_NAME}/kri/all`);
     const response = await axios.get(`/${process.env.VUE_APP_BACKEND_NAME}/kri/all`);
     return response.data;
 };

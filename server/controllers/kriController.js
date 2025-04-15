@@ -1,3 +1,4 @@
+console.log("kriController.js loaded")
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -36,6 +37,7 @@ const upload = multer({ storage });
 
 // Route to get all KRIs
 router.get('/all', (req, res) => {
+  console.log("GET /kri/all endpoint called")
   const kris = kriService.getKRIs();
   res.json(kris);
 });
