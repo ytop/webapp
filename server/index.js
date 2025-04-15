@@ -2,14 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const db = require('./db');
-
+const app = require('./app');
 // Import routes
-const kriRoutes = require('./routes/kri');
+const kriRouter = require('./controllers/kriController');
+const PORT = process.env.PORT || 8889;
 
-// Initialize Express app
-const app = express();
-const PORT = process.env.PORT || 8888;
 
 // Middleware
 app.use(cors());
@@ -21,7 +18,7 @@ const uploadsDir = path.join(__dirname, 'uploads');
 app.use('/uploads', express.static(uploadsDir));
 
 // Routes
-app.use('/kri', kriRoutes);
+app.use("/api/kri",kriRouter)
 
 // Health check endpoint
 app.get('/health', (req, res) => {

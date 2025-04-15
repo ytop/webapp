@@ -1,3 +1,4 @@
+
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 const Memory = require('lowdb/adapters/Memory');
@@ -9,7 +10,7 @@ const adapter = new Memory();
 const db = low(adapter);
 
 // Import mock data from the data file
-const { mockKRIs, mockKriTasks } = require('./data/kri');
+const { mockKRIs, mockKriTasks } = require('../entities/kriEntity');
 
 // Set default data
 db.defaults({
