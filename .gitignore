@@ -41,3 +41,5 @@ Thumbs.db
 server/uploads/*
 !server/uploads/.gitkeep
 .vercel
+
+./idx
