@@ -45,7 +45,7 @@ router.get('/all', (req, res) => {
 // Route to get all KRI tasks
 router.get('/alltasks', (req, res) => {
   console.log('GET /kri/alltasks endpoint called');
-  const tasks = db.getKRITasks();
+  const tasks = kriService.getKRITasks();
   console.log(`Returning ${tasks ? tasks.length : 0} KRI tasks`); // Use kriService for database interactions
   res.json(tasks || []);
 })
@@ -56,7 +56,7 @@ router.get('/alltasks', (req, res) => {
  */
 router.get('/:kriId', (req, res) => {
   const { kriId } = req.params;
-  const kri = getKRIById(kriId);
+  const kri = kriService.getKRIById(kriId);
 
   if (!kri) {
     return res.status(404).json({
