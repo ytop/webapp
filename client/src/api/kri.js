@@ -1,4 +1,4 @@
-import axios from 'axios';
+import request from '@/utils/request';
 
 /**
  * KRI Inventory API Functions
@@ -9,8 +9,8 @@ import axios from 'axios';
  * @returns {Promise} Promise that resolves to an array of KRIs
  */
 export const getKRIs = async () => {
-    console.log("Fetching KRIs " +  `/${process.env.VUE_APP_BACKEND_NAME}/kri/all`);
-    const response = await axios.get(`/${process.env.VUE_APP_BACKEND_NAME}/kri/all`);
+    console.log("Fetching KRIs " +  `/kri/all`);
+    const response = await request.get(`/kri/all`);
     return response.data;
 };
 
@@ -22,7 +22,7 @@ export const getKRIs = async () => {
  */
 export const updateKRIDescription = async (kri_id, newDescription) => {
     console.log("Updating KRI description", kri_id, newDescription);
-    const response = await axios.post(`/${process.env.VUE_APP_BACKEND_NAME}/kri/updateDescription`, null, {
+    const response = await request.post(`/kri/updateDescription`, null, {
         params: {
             kriId: kri_id,
             newDescription,
@@ -39,8 +39,8 @@ export const updateKRIDescription = async (kri_id, newDescription) => {
  */
 export const updateKRI = async (kriId, kriData) => {
     console.log("Updating KRI", kriId, kriData);
-    const response = await axios.post(
-        `/${process.env.VUE_APP_BACKEND_NAME}/kri/update`,
+    const response = await request.post(
+        `/kri/update`,
         kriData,
         {
             params: { kriId }
@@ -60,8 +60,8 @@ export const uploadKRIDocument = async (kriId, file) => {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await axios.post(
-        `/${process.env.VUE_APP_BACKEND_NAME}/kri/uploadDocument`,
+    const response = await request.post(
+        `/kri/uploadDocument`,
         formData,
         {
             params: { kriId },
@@ -84,7 +84,7 @@ export const uploadKRIDocument = async (kriId, file) => {
 export const getKriTasks = async () => {
   try {
     console.log("API: Fetching KRI tasks from new endpoint");
-    const response = await axios.get(`/${process.env.VUE_APP_BACKEND_NAME}/kri/alltasks`);
+    const response = await request.get(`/kri/alltasks`);
     console.log("API: KRI tasks response:", response.data);
     return response.data || [];
   } catch (error) {
@@ -101,8 +101,8 @@ export const getKriTasks = async () => {
 export const submitKriValue = async (kriValueData) => {
   try {
     console.log("Submitting KRI value", kriValueData);
-    const response = await axios.post(
-      `/${process.env.VUE_APP_BACKEND_NAME}/kri/tasks/submitValue`,
+    const response = await request.post(
+      `/kri/tasks/submitValue`,
       kriValueData
     );
     return response.data;

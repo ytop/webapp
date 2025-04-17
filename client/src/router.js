@@ -7,7 +7,7 @@ Vue.use(Router)
 // Create router instance outside export for better performance
 const router = new Router({
   mode: 'history',
-  base: process.env.VUE_APP_PROXY,
+  base: process.env.BASE_URL || '/', // Use BASE_URL with fallback
   routes: [
     {
       path: '/',

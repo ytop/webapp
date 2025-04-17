@@ -3,6 +3,7 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import { testApiConnection } from './utils/testApi'
 
 // Initialize Vue with optimizations
 Vue.use(ElementUI, { size: 'medium' }) // Set default component size
@@ -15,6 +16,9 @@ const app = new Vue({
   router,
   render: h => h(App)
 })
+
+// Make API test function available globally
+window.testApiConnection = testApiConnection
 
 // Export app instance for potential external usage
 export default app

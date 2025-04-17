@@ -31,12 +31,14 @@ module.exports = {
     },
     disableHostCheck: true,
     proxy: {
+      // Proxy API requests to the backend server
       [`/${process.env.VUE_APP_BACKEND_NAME}`]: {
         target: process.env.VUE_APP_PROXY,
         changeOrigin: true,
         pathRewrite: {
-          [`^/${process.env.VUE_APP_BACKEND_NAME}`]: ''
-        }
+          [`^/${process.env.VUE_APP_BACKEND_NAME}`]: '/rdaapi'
+        },
+        logLevel: 'debug' // Add debug logging
       }
     }
   },

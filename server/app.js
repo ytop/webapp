@@ -12,6 +12,12 @@ const PORT = process.env.PORT || 8888;
 // Enable CORS for cross-origin requests
 app.use(cors());
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Parse incoming requests with JSON payloads
 app.use(bodyParser.json());
 
@@ -28,7 +34,9 @@ app.use('/uploads', express.static(uploadsDir));
 const kriRouter = require('./controllers/kriController');
 
 // Routes
-app.use("/rdaapi/kri",kriRouter)
+// Mount the KRI router at both /kri and /rdaapi/kri to support different client configurations
+app.use("/kri", kriRouter);
+app.use("/rdaapi/kri", kriRouter);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -50,7 +58,7 @@ app.get('/test-alltasks', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React build directory
   app.use(express.static(path.join(__dirname, '../dist')));
-  
+
   // Handle all other requests by serving the React app's index.html
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../dist', 'index.html'));
