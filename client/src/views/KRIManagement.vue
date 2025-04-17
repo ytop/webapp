@@ -3,8 +3,7 @@
     id="app"
     style="padding: 20px;"
   >
-    <!-- API Status Component (only visible in development) -->
-    <api-status v-if="isDevelopment" />
+    <!-- API Status Component removed -->
 
     <el-tabs v-model="activeTab">
       <el-tab-pane
@@ -34,27 +33,19 @@
 import Dashboard from './dashboard/Dashboard.vue';
 import Task from './task/Task.vue';
 import Inventory from './inventory/Inventory.vue';
-import ApiStatus from '@/components/ApiStatus.vue';
 
 export default {
   name: 'KRIManagement',
   components: {
     Dashboard,
     Task,
-    Inventory,
-    ApiStatus
+    Inventory
   },
   data() {
     return {
       // Set the initially active tab
       activeTab: 'dashboard'
     };
-  },
-  computed: {
-    // Check if we're in development mode
-    isDevelopment() {
-      return process.env.NODE_ENV === 'development';
-    }
   }
 }
 </script>
