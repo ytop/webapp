@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.web.incident.dao.IncidentMapper">
+    <resultMap type="com.web.incident.entity.Incident" id="IncidentResult">
+        <id property="autoId" column="auto_id"/>
+        <result property="incidentNo" column="incident_no"/>
+        <result property="incidentType" column="incident_type"/>
+        <result property="incidentStatus" column="incident_status"/>
+        <result property="occurrenceDate" column="occurrence_date"/>
+        <result property="identificationDate" column="identification_date"/>
+        <result property="incidentTitle" column="incident_title"/>
+        <result property="identifiedBy" column="identified_by"/>
+        <result property="ownerDepartment" column="owner_department"/>
+        <result property="incidentDescription" column="incident_description"/>
+        <result property="riskRating" column="risk_rating"/>
+        <result property="primaryRiskType" column="primary_risk_type"/>
+        <result property="primaryLevelIiRisk" column="primary_level_ii_risk"/>
+        <result property="secondaryRiskType" column="secondary_risk_type"/>
+        <result property="secondaryLevelIiRisk" column="secondary_level_ii_risk"/>
+        <result property="primaryOwnerDept" column="primary_owner_dept"/>
+        <result property="secondaryOwnerDept" column="secondary_owner_dept"/>
+        <result property="rootCauseCategory" column="root_cause_category"/>
+        <result property="rootCauseSubcategory" column="root_cause_subcategory"/>
+        <result property="rootCauseAnalysis" column="root_cause_analysis"/>
+        <result property="existingControls" column="existing_controls"/>
+        <result property="dueDate" column="due_date"/>
+        <result property="financialImpact" column="financial_impact"/>
+        <result property="recoveryAmount" column="recovery_amount"/>
+        <result property="recoveryDate" column="recovery_date"/>
+        <result property="glCode" column="gl_code"/>
+        <result property="glCodeName" column="gl_code_name"/>
+        <result property="headOfficeCode" column="head_office_code"/>
+        <result property="incidentComments" column="incident_comments"/>
+        <result property="feedbackIncidentType" column="feedback_incident_type"/>
+        <result property="feedbackIncidentDescription" column="feedback_incident_description"/>
+        <result property="feedbackImpactDescription" column="feedback_impact_description"/>
+        <result property="feedbackImpactType" column="feedback_impact_type"/>
+        <result property="feedbackRootCause" column="feedback_root_cause"/>
+        <result property="feedbackExistingControls" column="feedback_existing_controls"/>
+        <result property="feedbackRiskRating" column="feedback_risk_rating"/>
+        <result property="feedbackBusinessIdentifiedIssue" column="feedback_business_identified_issue"/>
+
+        <!-- Adding closure management fields -->
+        <result property="actionTaken" column="action_taken"/>
+        <result property="closureDate" column="closure_date"/>
+        <result property="closureApprovedBy" column="closure_approved_by"/>
+        <result property="closureApprovedDate" column="closure_approved_date"/>
+
+        <!-- Adding status tracking fields -->
+        <result property="attachmentCount" column="attachment_count"/>
+        <result property="reviewStatus" column="review_status"/>
+        <result property="isBusinessIssue" column="is_business_issue"/>
+
+        <!-- Adding notification tracking fields -->
+        <result property="lastNotificationDate" column="last_notification_date"/>
+        <result property="notificationCount" column="notification_count"/>
+
+        <!-- Adding audit fields -->
+        <result property="createdBy" column="created_by"/>
+        <result property="createdDate" column="created_date"/>
+        <result property="lastModifiedBy" column="last_modified_by"/>
+        <result property="lastModifiedDate" column="last_modified_date"/>
+    </resultMap>
+
+    <select id="selectIncidentList" parameterType="java.util.Map" resultMap="IncidentResult">
+        SELECT * FROM web.IMP_INCIDENT
+        WHERE 1=1
+        <if test="incidentNo != null and incidentNo != ''">
+            AND incident_no = #{incidentNo}
+        </if>
+        <if test="incidentStatus != null and incidentStatus != ''">
+            AND incident_status = #{incidentStatus}
+        </if>
+        <if test="ownerDept != null and ownerDept != ''">
+            AND owner_department = #{ownerDept}
+        </if>
+        <if test="primaryRiskType != null and primaryRiskType != ''">
+            AND primary_risk_type = #{primaryRiskType}
+        </if>
+        <if test="identificationDateFrom != null">
+            AND CONVERT(date, identification_date) >= CONVERT(date, #{identificationDateFrom})
+        </if>
+        <if test="identificationDateTo != null">
+            AND CONVERT(date, identification_date) &lt;= CONVERT(date, #{identificationDateTo})
+        </if>
+        <if test="occurrenceDateFrom != null">
+            AND occurrence_date >= #{occurrenceDateFrom}
+        </if>
+        <if test="occurrenceDateTo != null">
+            AND occurrence_date &lt;= #{occurrenceDateTo}
+        </if>
+        ORDER BY auto_id DESC
+    </select>
+</mapper>

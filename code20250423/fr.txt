@@ -1,0 +1,3944 @@
+<<<BEGIN_FILE>>>
+RelativePath:
+FileName:getters.js
+FileSize:1172
+<<<BEGIN_CONTENT>>>
+const getters = {
+  sidebar: state => state.app.sidebar,
+  language: state => state.app.language,
+  size: state => state.app.size,
+  device: state => state.app.device,
+  visitedViews: state => state.tagsView.visitedViews,
+  cachedViews: state => state.tagsView.cachedViews,
+  token: state => state.user.token,
+  avatar: state => state.user.avatar,
+  name: state => state.user.name,
+  introduction: state => state.user.introduction,
+  roles: state => state.user.roles,
+  userId: state => state.user.id,
+  branchName: state => state.user.branchName,
+  deptId: state => state.user.deptId,
+  stateCode: state => state.user.status,
+  permissions: state => state.user.permissions,
+  permission_routes: state => state.permission.routes,
+  children_routes: state => state.permission.childrenRoutes,
+  errorLogs: state => state.errorLog.logs,
+  activeMenu: state => state.permission.activeMenu,
+  biLvl: state => state.user.biLvl,
+  tableName: state => state.nearMiss.tableName,
+  detection_id: state => state.nearMiss.detection_id,
+  activeNames: state => state.nearMiss.activeNames,
+  refresh: state => state.nearMiss.refresh
+}
+export default getters
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:
+FileName:index.js
+FileSize:4690
+<<<BEGIN_CONTENT>>>
+// src/api/regulatory.js
+import request from '@/utils/request' // Assuming you have an axios instance setup
+
+
+
+/**
+ * Get all table names
+ * @returns {Promise}
+ */
+export function getAllTables() {
+  return request({
+    url: '/mra/admin/tables',
+    method: 'get'
+  })
+}
+
+/**
+ * Get table metadata
+ * @param {string} tableName - Name of the table
+ * @returns {Promise}
+ */
+export function getTableMetadata(tableName) {
+  return request({
+    url: `/mra/admin/metadata/${tableName}`,
+    method: 'get'
+  })
+}
+
+/**
+ * Get table data with pagination
+ * @param {string} tableName - Name of the table
+ * @param {Object} params - Query parameters
+ * @param {number} [params.page=1] - Page number
+ * @param {number} [params.size=10] - Page size
+ * @param {string} [params.sort] - Sort field
+ * @param {string} [params.order] - Sort order
+ * @returns {Promise}
+ */
+export function getTableData(tableName, params = {}) {
+  return request({
+    url: `/mra/admin/table/${tableName}`,
+    method: 'get',
+    params: {
+      page: params.page || 1,
+      size: params.size || 10,
+      sort: params.sort,
+      order: params.order
+    }
+  })
+}
+
+/**
+ * Create new record in table
+ * @param {string} tableName - Name of the table
+ * @param {Object} record - Record data
+ * @returns {Promise}
+ */
+export function createTableRecord(tableName, record) {
+  return request({
+    url: `/mra/admin/table/${tableName}`,
+    method: 'post',
+    data: record
+  })
+}
+
+/**
+ * Update existing record in table
+ * @param {string} tableName - Name of the table
+ * @param {number} id - Record ID
+ * @param {Object} record - Updated record data
+ * @returns {Promise}
+ */
+export function updateTableRecord(tableName, id, record) {
+  return request({
+    url: `/mra/admin/table/${tableName}/${id}`,
+    method: 'put',
+    data: record
+  })
+}
+
+/**
+ * Delete record from table
+ * @param {string} tableName - Name of the table
+ * @param {number} id - Record ID
+ * @returns {Promise}
+ */
+export function deleteTableRecord(tableName, id) {
+  return request({
+    url: `/mra/admin/table/${tableName}/${id}`,
+    method: 'delete'
+  })
+}
+
+/**
+ * Execute Detection Query
+ * @param {number} detectionId - Detection ID
+ * @returns {Promise}
+ */
+export function executeDetectionQuery(detectionId) {
+  return request({
+    url: `/mra/admin/detection/list/${detectionId}`,
+    method: 'get'
+  })
+}
+
+/**
+ * Get Detection History, 8 days, including today
+ * @returns {Promise}
+ */
+export function getWeeklyDetections() {
+  return request({
+    url: `/mra/admin/detection/selectWeekly`,
+    method: 'get'
+  })
+}
+
+/**
+ * Get Quarter Data
+ * @returns {Promise}
+ */
+export function getQuarterlyDetections() {
+  return request({
+    url: `/mra/admin/detection/selectNearMissHistory`,
+    method: 'get'
+  })
+}
+
+/**
+ * Upload files
+ */
+export function uploadFiles(data) {
+  return request({
+    url: '/mra/admin/upload',
+    method: 'post',
+    data,
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+
+/**
+ * List files and directories at the specified path
+ * @param {string} path - Directory path to list
+ * @returns {Promise} Response with items array
+ */
+export function listDownloadFiles(path) {
+  return request({
+    url: '/mra/admin/files',
+    method: 'get',
+    params: { path }
+  })
+}
+
+/**
+ * Get download URL for a specific file
+ * @param {string} path - File path to download
+ * @returns {string} Download URL for the file
+ */
+export function getDownloadUrl(path) {
+  return `/mra/admin/download?path=${encodeURIComponent(path)}`
+}
+
+/**
+ * Query Incident List
+ * @param {Object} params - Query parameters
+ * @param {string} [params.incidentNo] - Incident number
+ * @param {string} [params.incidentStatus] - Incident status
+ * @param {string} [params.primaryOwnerDept] - Primary owner department
+ * @param {string} [params.riskRating] - Risk rating
+ * @param {string} [params.occurrenceDateFrom] - Start date of occurrence
+ * @param {string} [params.occurrenceDateTo] - End date of occurrence
+ * @returns {Promise}
+ */
+export function getIncidentList(params = {}) {
+  return request({
+    url: '/mra/incident/list',
+    method: 'get',
+    params
+  })
+}
+
+export function getIncidentData(params) {
+  return request({
+    url: '/mra/incident/exportIncident',
+    method: 'post',
+    data: params,
+    responseType: 'blob'
+  })
+}
+
+
+//export function exportDataInventory(data) {
+//  return request({
+//    url: '/kri/exportDataInventory',
+//    method: 'post',
+//    data: data,
+//    responseType: 'blob'
+
+//  })
+//}
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:AuditTrail.vue
+FileSize:947
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="audit-trail">
+
+    <el-card>
+
+      <div slot="header" class="flex items-center">
+
+        <span class="font-medium text-lg">For Audit Only  </span>
+
+      </div>
+
+      <audit-trail-data v-if="selectedTable" :key="selectedTable" :table-name="selectedTable" />
+
+    </el-card>
+
+  </div>
+</template>
+
+<script>
+import AuditTrailData from './AuditTrailData.vue'
+
+export default {
+  name: 'AuditTrail',
+
+  components: {
+    AuditTrailData
+  },
+
+  data() {
+    return {
+      selectedTable: ''
+    }
+  },
+
+  async created() {
+    this.fetchTables()
+  },
+
+  methods: {
+    fetchTables() {
+        this.selectedTable = 'IMP_DETECTION_AUDIT_TRAIL'
+    }
+  }
+}
+</script>
+
+<style scoped>
+.audit-trail {
+    @apply p-5;
+}
+
+/* Element UI overrides */
+
+:deep(.el-card__header) {
+    @apply p-4 border-b border-gray-200;
+}
+
+:deep(.el-card__body) {
+    @apply p-4;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:AuditTrailData.vue
+FileSize:5473
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="audit-trail-data">
+    <!-- Data Table -->
+
+    <el-table v-loading="loading" :data="filteredTableData" border class="w-full mt-5">
+
+      <el-table-column v-for="field in tableFields" :key="field.columnName" :prop="field.columnName" :label="formatLabel(field.columnName)" sortable />
+      
+    </el-table>
+
+    <!-- Dynamic Form Dialog -->
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      width="50%"
+      @close="resetForm"
+    >
+      <el-form
+        ref="form"
+        :model="formData"
+        :rules="formRules"
+        label-width="120px"
+      >
+        <el-form-item
+          v-for="field in formFields"
+          :key="field.columnName"
+          :label="formatLabel(field.columnName)"
+          :prop="field.columnName"
+        >
+          <!-- Input type based on data type -->
+          <template v-if="field.dataType === 'datetime'">
+            <el-date-picker v-model="formData[field.columnName]" type="datetime" placeholder="Select date and time" class="w-full" />
+          </template>
+
+          <template v-else-if="field.dataType === 'number'">
+            <el-input-number v-model="formData[field.columnName]" :controls="false" class="w-full" />
+          </template>
+
+          <template v-else-if="field.dataType === 'boolean'">
+            <el-switch v-model="formData[field.columnName]" active-text="Yes" inactive-text="No" />
+          </template>
+
+          <template v-else>
+            <el-input v-model="formData[field.columnName]" :type="field.dataType === 'text' ? 'textarea' : 'text'" :autosize="field.dataType === 'text' ? { minRows: 2, maxRows: 4 } : false" />
+          </template>
+        </el-form-item>
+      </el-form>
+     
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import {
+  getTableMetadata,
+  getTableData
+} from '@/api/mra'
+
+export default {
+  name: 'AuditTrailData',
+
+  props: {
+    tableName: {
+      type: String,
+      required: true
+    }
+  },
+
+  data() {
+    return {
+      loading: false,
+      tableData: [],
+      tableFields: [],
+      searchQuery: '',
+      dialogVisible: false,
+      dialogTitle: '',
+      formData: {},
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
+      formRules: {},
+      isEdit: false
+    }
+  },
+
+  computed: {
+    filteredTableData() {
+      if (!this.searchQuery) return this.tableData
+
+      return this.tableData.filter(row => {
+        return Object.values(row).some(value =>
+          String(value).toLowerCase().includes(this.searchQuery.toLowerCase())
+        )
+      })
+    },
+
+    formFields() {
+      return this.tableFields.filter(field => field.columnName !== 'auto_id')
+    }
+  },
+
+  created() {
+    this.initializeTable()
+  },
+
+  methods: {
+    async initializeTable() {
+      try {
+        this.loading = true
+        await this.fetchMetadata()
+        await this.fetchData()
+      } catch (error) {
+        console.error('Error initializing table:', error)
+        this.$message({
+          message: 'Failed to initialize table',
+          type: 'error',
+          duration: 5000
+        })
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchMetadata() {
+      try {
+        const response = await getTableMetadata(this.tableName)
+        if (response.code === 200) {
+          this.tableFields = response.data
+          this.generateFormRules()
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch table metadata')
+        }
+      } catch (error) {
+        console.error('Error fetching metadata:', error)
+        this.$message({
+          message: 'Failed to fetch table metadata',
+          type: 'error',
+          duration: 5000
+        })
+        throw error
+      }
+    },
+
+    async fetchData() {
+      try {
+        const response = await getTableData(this.tableName, {
+          page: this.currentPage,
+          size: this.pageSize
+        })
+
+        if (response.code === 200) {
+          this.tableData = response.data.content
+          this.total = response.data.total
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch table data')
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        this.$message({
+          message: 'Failed to fetch table data',
+          type: 'error',
+          duration: 5000
+        })
+        throw error
+      }
+    },
+
+   
+
+    generateFormRules() {
+      const rules = {}
+      this.tableFields.forEach(field => {
+        if (field.nullable === false && field.columnName !== 'auto_id') {
+          rules[field.columnName] = [{
+            required: true,
+            message: `${this.formatLabel(field.columnName)} is required`,
+            trigger: 'blur'
+          }]
+        }
+      })
+      this.formRules = rules
+    },
+
+    formatLabel(columnName) {
+      return columnName
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    },
+
+   
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.fetchData()
+    },
+
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.fetchData()
+    }
+  }
+
+}
+</script>
+
+<style scoped>
+.audit-trail-data {
+    @apply p-5;
+}
+
+.operation-bar {
+    @apply flex items-center mb-5;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:DownloadFile.vue
+FileSize:4363
+<<<BEGIN_CONTENT>>>
+<template>
+  <el-card class="download-file">
+    <!-- Path navigation -->
+    <el-breadcrumb separator="/">
+      <el-breadcrumb-item
+        v-for="(path, index) in breadcrumbs"
+        :key="index"
+        @click.native="navigateToBreadcrumb(index)"
+      >
+        {{ path }}
+      </el-breadcrumb-item>
+    </el-breadcrumb>
+
+    <!-- Main content -->
+    <div v-loading="loading" class="content-wrapper">
+      <el-table
+        :data="items"
+        style="width: 100%"
+        @row-dblclick="handleDoubleClick"
+      >
+        <!-- Name column -->
+        <el-table-column label="Name" min-width="300">
+          <template slot-scope="scope">
+            <div class="item-name">
+              <i :class="getIcon(scope.row)" class="item-icon" />
+              {{ scope.row.name }}
+            </div>
+          </template>
+        </el-table-column>
+
+        <!-- Size column -->
+        <el-table-column label="Size" width="120" align="right">
+          <template slot-scope="scope">
+            {{ scope.row.type === 'file' ? formatSize(scope.row.size) : '-' }}
+          </template>
+        </el-table-column>
+
+        <!-- Modified date column -->
+        <el-table-column label="Modified" width="180">
+          <template slot-scope="scope">
+            {{ formatDate(scope.row.modifiedDate) }}
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+  </el-card>
+</template>
+
+<script>
+import { listDownloadFiles } from '@/api/mra'
+
+export default {
+  name: 'FileExplorer',
+  data() {
+    return {
+      currentPath: '',
+      items: [],
+      breadcrumbs: [],
+      loading: false
+    }
+  },
+
+  created() {
+    this.loadDirectory('')
+  },
+
+  methods: {
+    async loadDirectory(path) {
+      this.loading = true
+      try {
+        const response = await listDownloadFiles(path)
+        console.log('Response:', JSON.stringify(response, null, 2))
+        if (response.code === 200) {
+          this.items = response.data.sort((a, b) => b.name.localeCompare(a.name))
+          this.currentPath = path
+          this.updateBreadcrumbs()
+        } else {
+          throw new Error('Invalid response code')
+        }
+      } catch (error) {
+        this.$message.error('Failed to load directory')
+        console.error('Failed to load directory:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    handleDoubleClick(row) {
+      if (row.type === 'directory') {
+        this.loadDirectory(row.path)
+      }
+    },
+
+    updateBreadcrumbs() {
+      this.breadcrumbs = ['root']
+      if (this.currentPath) {
+        this.breadcrumbs.push(...this.currentPath.split('/').filter(Boolean))
+      }
+    },
+
+    navigateToBreadcrumb(index) {
+      if (index === 0) {
+        this.loadDirectory('')
+      } else {
+        const path = this.breadcrumbs
+          .slice(1, index + 1)
+          .join('/')
+        this.loadDirectory(path)
+      }
+    },
+
+    getIcon(item) {
+      if (item.type === 'directory') {
+        return 'el-icon-folder'
+      }
+
+      const extension = item.name.split('.').pop().toLowerCase()
+      const iconMap = {
+        pdf: 'el-icon-document',
+        doc: 'el-icon-document',
+        docx: 'el-icon-document',
+        xls: 'el-icon-document',
+        xlsx: 'el-icon-document',
+        txt: 'el-icon-document-text',
+        jpg: 'el-icon-picture',
+        jpeg: 'el-icon-picture',
+        png: 'el-icon-picture',
+        gif: 'el-icon-picture'
+      }
+      return iconMap[extension] || 'el-icon-document'
+    },
+
+    formatSize(bytes) {
+      if (!bytes) return '0 B'
+      const units = ['B', 'KB', 'MB', 'GB', 'TB']
+      let i = 0
+      while (bytes >= 1024 && i < units.length - 1) {
+        bytes /= 1024
+        i++
+      }
+      return `${bytes.toFixed(1)} ${units[i]}`
+    },
+
+    formatDate(timestamp) {
+      if (!timestamp) return '-'
+      return new Date(timestamp).toLocaleString()
+    }
+  }
+}
+</script>
+
+<style>
+.download-file {
+  margin: 20px;
+}
+
+.content-wrapper {
+  margin-top: 20px;
+  min-height: 400px;
+}
+
+.item-name {
+  display: flex;
+  align-items: center;
+}
+
+.item-icon {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.el-breadcrumb__item:hover {
+  cursor: pointer;
+  color: #409EFF;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:DynamicTableCrud.vue
+FileSize:8542
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="dynamic-table-crud">
+
+    <!-- Table Operations -->
+    <!-- Data Table -->
+
+    <el-table v-loading="loading" :data="filteredTableData" border class="w-full mt-5">
+
+      <el-table-column v-for="field in tableFields" :key="field.columnName" :prop="field.columnName" :label="formatLabel(field.columnName)" sortable />
+
+      <el-table-column label="Operations" width="200" fixed="right">
+
+        <template slot-scope="scope">
+
+          <el-button type="text" @click="handleEdit(scope.row)">Edit</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- Dynamic Form Dialog -->
+    <el-dialog
+      :title="dialogTitle"
+      :visible.sync="dialogVisible"
+      width="50%"
+      @close="resetForm"
+    >
+      <el-form
+        ref="form"
+        :model="formData"
+        :rules="formRules"
+        label-width="120px"
+      >
+        <el-form-item
+          v-for="field in formFields"
+          :key="field.columnName"
+          :label="formatLabel(field.columnName)"
+          :prop="field.columnName"
+        >
+          <!-- Input type based on data type -->
+          <template v-if="field.dataType === 'datetime'">
+            <el-date-picker v-model="formData[field.columnName]" type="datetime" placeholder="Select date and time" class="w-full" :disabled="true" />
+          </template>
+
+          <template v-else-if="field.dataType === 'number'">
+            <el-input-number v-model="formData[field.columnName]" :controls="false" class="w-full" :disabled="true" />
+          </template>
+
+          <template v-else-if="field.dataType === 'boolean'">
+            <el-switch v-model="formData[field.columnName]" active-text="Yes" inactive-text="No" :disabled="true" />
+          </template>
+
+          <template v-else>
+            <el-input
+              v-model="formData[field.columnName]"
+              :type="field.dataType === 'text' ? 'textarea' : 'text'"
+              :autosize="field.dataType === 'text' ? { minRows: 2, maxRows: 4 } : false"
+              :disabled="!(field.dataType === 'text' && ['cell_params', 'string_value'].includes(field.columnName))"
+            />
+          </template>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitForm">Confirm</el-button>
+      </span>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import {
+  getTableMetadata,
+  getTableData,
+  createTableRecord,
+  updateTableRecord,
+  deleteTableRecord
+} from '@/api/mra'
+
+export default {
+  name: 'DynamicTableCrud',
+
+  props: {
+    tableName: {
+      type: String,
+      required: true
+    }
+  },
+
+  data() {
+    return {
+      loading: false,
+      tableData: [],
+      tableFields: [],
+      searchQuery: '',
+      dialogVisible: false,
+      dialogTitle: '',
+      formData: {},
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
+      formRules: {},
+      isEdit: false
+    }
+  },
+
+  computed: {
+    filteredTableData() {
+      if (!this.searchQuery) return this.tableData
+
+      return this.tableData.filter(row => {
+        return Object.values(row).some(value =>
+          String(value).toLowerCase().includes(this.searchQuery.toLowerCase())
+        )
+      })
+    },
+
+    formFields() {
+      return this.tableFields.filter(field => field.columnName !== 'auto_id')
+    }
+  },
+
+  created() {
+    this.initializeTable()
+  },
+
+  methods: {
+    async initializeTable() {
+      try {
+        this.loading = true
+        await this.fetchMetadata()
+        await this.fetchData()
+      } catch (error) {
+        console.error('Error initializing table:', error)
+        this.$message({
+          message: 'Failed to initialize table',
+          type: 'error',
+          duration: 5000
+        })
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async fetchMetadata() {
+      try {
+        const response = await getTableMetadata(this.tableName)
+        if (response.code === 200) {
+          this.tableFields = response.data
+          this.generateFormRules()
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch table metadata')
+        }
+      } catch (error) {
+        console.error('Error fetching metadata:', error)
+        this.$message({
+          message: 'Failed to fetch table metadata',
+          type: 'error',
+          duration: 5000
+        })
+        throw error
+      }
+    },
+
+    async fetchData() {
+      try {
+        const response = await getTableData(this.tableName, {
+          page: this.currentPage,
+          size: this.pageSize
+        })
+
+        if (response.code === 200) {
+          this.tableData = response.data.content
+          this.total = response.data.total
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch table data')
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        this.$message({
+          message: 'Failed to fetch table data',
+          type: 'error',
+          duration: 5000
+        })
+        throw error
+      }
+    },
+
+    async handleDelete(row) {
+      try {
+        await this.$confirm('Are you sure you want to delete this record?', 'Warning', {
+          type: 'warning'
+        })
+
+        const response = await deleteTableRecord(this.tableName, row.auto_id)
+        if (response.code === 200) {
+          this.$message({
+            message: 'Record deleted successfully',
+            type: 'success',
+            duration: 3000
+          })
+          await this.fetchData()
+        } else {
+          this.$message.error(response.msg || 'Failed to delete record')
+        }
+      } catch (error) {
+        if (error !== 'cancel') {
+          console.error('Error deleting record:', error)
+          this.$message({
+            message: 'Failed to delete record',
+            type: 'error',
+            duration: 5000
+          })
+        }
+      }
+    },
+
+    async submitForm() {
+      try {
+        await this.$refs.form.validate()
+
+        let response
+        if (this.isEdit) {
+          response = await updateTableRecord(
+            this.tableName,
+            this.formData.auto_id,
+            this.formData
+          )
+        } else {
+          response = await createTableRecord(this.tableName, this.formData)
+        }
+
+        if (response.code === 200) {
+          this.$message({
+            message: `Record ${this.isEdit ? 'updated' : 'created'} successfully`,
+            type: 'success',
+            duration: 3000
+          })
+          this.dialogVisible = false
+          await this.fetchData()
+        } else {
+          this.$message.error(response.msg || `Failed to ${this.isEdit ? 'update' : 'create'} record`)
+        }
+      } catch (error) {
+        if (error !== false) {
+          console.error('Error submitting form:', error)
+          this.$message({
+            message: `Failed to ${this.isEdit ? 'update' : 'create'} record`,
+            type: 'error',
+            duration: 5000
+          })
+        }
+      }
+    },
+    generateFormRules() {
+      const rules = {}
+      this.tableFields.forEach(field => {
+        if (field.nullable === false && field.columnName !== 'auto_id') {
+          rules[field.columnName] = [{
+            required: true,
+            message: `${this.formatLabel(field.columnName)} is required`,
+            trigger: 'blur'
+          }]
+        }
+      })
+      this.formRules = rules
+    },
+
+    formatLabel(columnName) {
+      return columnName
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ')
+    },
+
+    handleEdit(row) {
+      this.isEdit = true
+      this.dialogTitle = 'Edit Record'
+      this.formData = { ...row }
+      this.dialogVisible = true
+    },
+    resetForm() {
+      if (this.$refs.form) {
+        this.$refs.form.resetFields()
+      }
+      this.formData = {}
+    },
+
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.fetchData()
+    },
+
+    handleCurrentChange(val) {
+      this.currentPage = val
+      this.fetchData()
+    }
+  }
+
+}
+</script>
+
+<style scoped>
+.dynamic-table-crud {
+    @apply p-5;
+}
+
+.operation-bar {
+    @apply flex items-center mb-5;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:index.vue
+FileSize:1172
+<<<BEGIN_CONTENT>>>
+<template>
+  <div id="adminincidenttab">
+    <el-tabs v-model="activeTab">
+      <el-tab-pane label="Meta Data" name="TableManager">
+        <table-manager></table-manager>
+      </el-tab-pane>
+      <el-tab-pane label="File Explorer" name="DownloadFile">
+        <download-file></download-file>
+      </el-tab-pane>
+      <el-tab-pane label="Validate" name="ValidateTrigger">
+        <validate-trigger></validate-trigger>
+      </el-tab-pane>
+      <el-tab-pane label="Audit Trail" name="AuditTrail">
+        <div v-if="activeTab === 'AuditTrail'">
+          <audit-trail></audit-trail>
+        </div>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
+</template>
+
+<script>
+import TableManager from './TableManager.vue'
+import DownloadFile from './DownloadFile.vue'
+import ValidateTrigger from './Validate.vue'
+import AuditTrail from './AuditTrail.vue'
+
+export default {
+  name: 'AdminIncidentMain',
+  components: {
+    TableManager,
+    DownloadFile,
+    ValidateTrigger,
+    AuditTrail
+  },
+  data() {
+    return {
+      activeTab: 'TableManager'
+    }
+  }
+}
+</script>
+
+<style>
+#adminincidenttab {
+  padding: 20px;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:TableManager.vue
+FileSize:2206
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="table-manager">
+
+    <el-card>
+
+      <div slot="header" class="flex items-center">
+
+        <span class="font-medium text-lg">Configuration </span>
+
+        <el-select v-model="selectedTable" placeholder="Select table" class="ml-5 w-64" @change="handleTableChange">
+
+          <el-option v-for="table in availableTables" :key="table.value" :label="table.label" :value="table.value" />
+
+        </el-select>
+
+      </div>
+
+      <dynamic-table-crud v-if="selectedTable" :key="selectedTable" :table-name="selectedTable" />
+
+    </el-card>
+
+  </div>
+</template>
+
+<script>
+import DynamicTableCrud from './DynamicTableCrud.vue'
+import { getAllTables } from '@/api/mra'
+
+export default {
+  name: 'TableManager',
+
+  components: {
+    DynamicTableCrud
+  },
+
+  data() {
+    return {
+      tables: [],
+      selectedTable: ''
+    }
+  },
+
+  computed: {
+    availableTables() {
+      return this.tables
+        .map(table => ({
+          value: table,
+          // Convert technical table name to more readable format
+          label: table.replace('web.IMP_', '')
+            .split('_')
+            .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+            .join(' ')
+        }))
+    }
+  },
+
+  async created() {
+    await this.fetchTables()
+  },
+
+  methods: {
+    async fetchTables() {
+      try {
+        const response = await getAllTables()
+        if (response.code === 200) { // Assuming your API returns a code property
+          this.tables = response.data
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch tables')
+        }
+      } catch (error) {
+        console.error('Error fetching tables:', error)
+        this.$message({
+          message: 'Failed to fetch tables ',
+          type: 'error',
+          duration: 5000
+        })
+      }
+    },
+
+    handleTableChange(value) {
+      this.selectedTable = value
+    }
+  }
+}
+</script>
+
+<style scoped>
+.table-manager {
+    @apply p-5;
+}
+
+/* Element UI overrides */
+
+:deep(.el-card__header) {
+    @apply p-4 border-b border-gray-200;
+}
+
+:deep(.el-card__body) {
+    @apply p-4;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\adminIncident
+FileName:Validate.vue
+FileSize:6777
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="validate-trigger">
+    <el-row v-for="num in [0, 1]" :key="`row-${num}`" class="monitor-row">
+      <el-col v-for="index in [0, 1, 2]" :key="`col-${num}-${index}`" :span="8">
+        <div
+          class = "monitor-card"
+          :class="getCardClass(tags[num * 3 + index] && tags[num * 3 + index].status)"
+        >
+          <div class="card-header">
+            <h3 class="card-title">
+               {{ (tags[num * 3 + index] && tags[num * 3 + index].title) || 'No Title' }}
+            </h3>
+          </div>
+          <div class = "card-actions">
+            <el-button 
+              class="action-button trigger-button"
+              icon="el-icon-video-play"
+              :loading="loadingStates[tags[num * 3 + index] && tags[num * 3 + index].title]"
+              @click="executeDetection(tags[num * 3 + index])"
+            >
+              Scan Now
+            </el-button>
+          </div>
+          <div class="addional-info">
+            {{ (tags[num * 3 + index] && tags[num * 3 + index].timestamp) || 'N/A' }} - {{ (tags[num * 3 + index] && tags[num * 3 + index].status) || 'N/A' }} - {{ (tags[num * 3 + index] && tags[num * 3 + index].type) || 'N/A' }} - 
+          </div>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+
+<script>
+import { executeDetectionQuery, getWeeklyDetections } from '@/api/mra'
+
+export default {
+  name: 'ValidateTrigger',
+  data() {
+    return {
+      timelineData: [],
+      loadingStates: {},
+      selectedItem: null,
+      detectionResults: null,
+      showResults: false
+    }
+  },
+  created() {
+   this.fetchDetections()
+  },
+  computed: {
+    tags() {
+      return this.timelineData
+    }
+  },
+  methods: {
+    getCardClass(status) {
+      return {
+        'successful': 'status-success',
+        'failed': 'status-danger',
+        'not started': 'status-info',
+      }[status] || 'status-default'
+    },
+    getStatusClass(status) {
+      return {
+        'successful': 'status-success',
+        'failed': 'status-danger',
+        'not started': 'status-info',
+      }[status] || 'status-default'
+    },
+    async fetchDetections() {
+     try {
+      const response = await getWeeklyDetections()
+      if (!response.code || response.code !== 200) {
+        console.error('Invalid response code:', response)
+        throw new Error('Invalid response code')
+      }
+
+      if (!response.data?.detections) {
+        console.error('Response detections field not found:', response)
+        throw new Error('Response detections field missing')
+      }
+
+      const latestDetections = {}
+      response.data.detections
+       .filter(item => item.event_date.startsWith(new Date().toLocaleDateString('en-CA')))
+       .forEach(item => {
+        if (!latestDetections[item.detection_id] || new Date(item.create_time) > new Date(latestDetections[item.detection_id].create_time)) {
+          latestDetections[item.detection_id] = item;
+        }
+       });
+
+      // Ensure each detection_id only has one row in timelineData
+      this.timelineData = Object.values(latestDetections)
+        .sort((a, b) => b.detection_id - a.detection_id)
+        .map(item => ({
+            title: `${item.detection_dept} ${item.detection_desc}, ID:${item.detection_id}`,
+            timestamp: item.event_date,
+            status: item.detection_status?.toLowerCase() || 'unknown',
+            type: item.near_miss_status,
+            detectionId: item.detection_id
+        }));
+      console.log('Processed timelineData:', this.timelineData)
+    } catch (error) {
+      this.$message({type: 'error', message: 'Failed to fetch detection data'})
+      console.error('Failed to fetch detection data:', error)
+    }
+   },
+
+    async executeDetection(item) {
+      if (!item) return
+
+      this.$set(this.loadingStates, item.title, true)
+
+      try {
+        // const detectionId = this.getDetectionId(item)
+        const detectionId = item.detectionId;
+        const response = await executeDetectionQuery(detectionId)
+
+        this.detectionResults = response.data
+        this.selectedItem = item
+        this.showResults = true
+
+        this.$message({
+          type: 'success',
+          message: `Done to detect for ${item.title}`
+        })
+
+        await this.fetchDetections()
+      } catch (error) {
+        this.$message({
+          type: 'error',
+          message: `Failed to execute detection: ${error.message}`
+        })
+      } finally {
+        this.$set(this.loadingStates, item.title, false)
+      }
+    },
+  }
+}
+</script>
+
+<style scoped>
+.validate-trigger {
+  height: 100%;
+  padding: 24px;
+  background-color: #f8f9fd;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.monitor-card {
+  height: 160px;
+  margin: 0 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.monitor-card:hover {
+  transform: translateY(-4px);
+   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #2c3e50;
+  while-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80%;
+}
+
+.status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.action-button {
+  flex: 1;
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 10px 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trigger-button {
+  background-color: #8dc0be;
+  color: white;
+  border: none;
+}
+
+.trigger-button:hover {
+  background-color: #1e89a1;
+}
+
+.status-success {
+  background-color: #f0fff4;
+  border-left: 4px solid #48bb78;
+}
+
+.status-danger {
+  background-color: #fff5f5;
+  border-left: 4px solid #f56565;
+}
+
+.status-info {
+  background-color: #ebf8ff;
+  border-left: 4px solid #4299e1;
+}
+
+.status-default {
+  background-color: #fff;
+  border-left: 4px solid #a0aec0;
+}
+
+.indicator-success {
+  background-color: #48bb78;
+}
+
+.indicator-danger {
+  background-color: #f56565;
+}
+
+.indicator-info {
+  background-color: #4299e1;
+}
+
+.indicator-default {
+  background-color: #a0a3c0;
+}
+
+@media (max-width: 768px) {
+  .monitor-card {
+    height: auto;
+    min-height: 160px;
+  }
+
+  .card-actions {
+    flex-direction: column;
+  }
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\components\mixins
+FileName:resize.js
+FileSize:1620
+<<<BEGIN_CONTENT>>>
+import { debounce } from '@/utils'
+
+export default {
+  data() {
+    return {
+      $_sidebarElm: null,
+      $_resizeHandler: null
+    }
+  },
+  mounted() {
+    this.$_resizeHandler = debounce(() => {
+      if (this.chart) {
+        this.chart.resize()
+      }
+    }, 100)
+    this.$_initResizeEvent()
+    this.$_initSidebarResizeEvent()
+  },
+  beforeDestroy() {
+    this.$_destroyResizeEvent()
+    this.$_destroySidebarResizeEvent()
+  },
+  // to fixed bug when cached by keep-alive
+  // https://github.com/PanJiaChen/vue-element-admin/issues/2116
+  activated() {
+    this.$_initResizeEvent()
+    this.$_initSidebarResizeEvent()
+  },
+  deactivated() {
+    this.$_destroyResizeEvent()
+    this.$_destroySidebarResizeEvent()
+  },
+  methods: {
+    // use $_ for mixins properties
+    // https://vuejs.org/v2/style-guide/index.html#Private-property-names-essential
+    $_initResizeEvent() {
+      window.addEventListener('resize', this.$_resizeHandler)
+    },
+    $_destroyResizeEvent() {
+      window.removeEventListener('resize', this.$_resizeHandler)
+    },
+    $_sidebarResizeHandler(e) {
+      if (e.propertyName === 'width') {
+        this.$_resizeHandler()
+      }
+    },
+    $_initSidebarResizeEvent() {
+      this.$_sidebarElm = document.getElementsByClassName('sidebar-container')[0]
+      this.$_sidebarElm && this.$_sidebarElm.addEventListener('transitionend', this.$_sidebarResizeHandler)
+    },
+    $_destroySidebarResizeEvent() {
+      this.$_sidebarElm && this.$_sidebarElm.removeEventListener('transitionend', this.$_sidebarResizeHandler)
+    }
+  }
+}
+
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissEvent
+FileName:constants.js
+FileSize:5711
+<<<BEGIN_CONTENT>>>
+// constants.js
+
+export const STATUS_ITEMS = [
+  { name: 'Open', count: 10, type: 'success' },
+  { name: 'Pending Validation', count: 0, type: 'success' },
+  { name: 'Pending Owner Action', count: 0, type: 'success' },
+  { name: 'Pending Closure Approval', count: 5, type: 'success' },
+  { name: 'Closed', count: 135, type: 'success' }
+]
+
+export const SEARCH_FIELDS = [
+  { label: 'Incident Number', value: 'incidentNo' },
+  { label: 'Incident Type', value: 'incidentType' },
+  { label: 'Status', value: 'status' },
+  { label: 'Occurrence Date', value: 'occurrenceDate' },
+  { label: 'Identification Date', value: 'identificationDate' },
+  { label: 'Incident Title', value: 'incidentTitle' },
+  { label: 'Identified By', value: 'identifiedBy' },
+  { label: 'Owner Department', value: 'ownerDepartment' },
+  { label: 'Description', value: 'description' },
+  { label: 'Risk Rating', value: 'riskRating' },
+  { label: 'Primary Risk Type', value: 'primaryRiskType' },
+  { label: 'Primary Level II Risk', value: 'primaryLevelIIRisk' },
+  { label: 'Secondary Risk Type', value: 'secondaryRiskType' },
+  { label: 'Secondary Level II Risk', value: 'secondaryLevelIIRisk' },
+  { label: 'Primary Owner Department', value: 'primaryOwnerDept' },
+  { label: 'Secondary Owner Department', value: 'secondaryOwnerDept' }
+]
+
+export const DUE_DATE_OPTIONS = [
+  { label: 'Past Due', value: 'pastDue' },
+  { label: 'Due in 1 Month', value: 'upcomingMonth' },
+  { label: 'Due in 1 Quarter', value: 'upcomingQuarter' },
+  { label: 'Others', value: 'others' }
+]
+
+export const RISK_RATING_OPTIONS = [
+  { label: 'Low', value: 'Low' },
+  { label: 'Medium', value: 'Medium' },
+  { label: 'High', value: 'High' }
+]
+
+export const OWNER_DEPT_OPTIONS = [
+  { label: 'ADC', value: 'ADC' },
+  { label: 'CLD', value: 'CLD' },
+  { label: 'OSD', value: 'OSD' }
+]
+
+
+export const RISK_TYPE_OPTS = [
+  { label: 'Operational Risk', value: 'Operational Risk' },
+  { label: 'Technology and Information Security', value: 'Technology and Information Security' }
+]
+
+export const RISK_TYPE_OPTIONS = [
+  {
+    value: 'Compliance Risk',
+    label: 'Compliance Risk',
+    children: [
+      {
+        value: 'Anti-Bribery and Anti-Corruption',
+        label: 'Anti-Bribery and Anti-Corruption'
+      },
+      { value: 'BSA/AML', label: 'BSA/AML' },
+      {
+        value: 'Consumer and Regulatory Compliance',
+        label: 'Consumer and Regulatory Compliance'
+      },
+      { value: 'Sanctions', label: 'Sanctions' }
+    ]
+  },
+  {
+    value: 'Credit Risk',
+    label: 'Credit Risk',
+    children: [
+      { value: 'Concentration', label: 'Concentration' },
+      { value: 'Credit Default', label: 'Credit Default' },
+      { value: 'Underwriting', label: 'Underwriting' },
+      { value: 'Counterparty', label: 'Counterparty' }
+    ]
+  },
+  {
+    value: 'Interest Rate Risk',
+    label: 'Interest Rate Risk',
+    children: [
+      { value: 'Basis', label: 'Basis' },
+      { value: 'Options', label: 'Options' },
+      { value: 'Repricing', label: 'Repricing' },
+      { value: 'Yield Curve', label: 'Yield Curve' }
+    ]
+  },
+  {
+    value: 'Liquidity Risk',
+    label: 'Liquidity Risk',
+    children: [
+      {
+        value: 'Asset/Market Liquidity',
+        label: 'Asset/Market Liquidity'
+      },
+      {
+        value: 'Contingent Liquidity',
+        label: 'Contingent Liquidity'
+      },
+      {
+        value: 'Funding Liquidity',
+        label: 'Funding Liquidity'
+      },
+      {
+        value: 'Intraday Liquidity',
+        label: 'Intraday Liquidity'
+      }
+    ]
+  },
+  {
+    value: 'Operational Risk',
+    label: 'Operational Risk',
+    children: [
+      { value: 'Fraud', label: 'Fraud' },
+      { value: 'Human Capital', label: 'Human Capital' },
+      { value: 'Legal', label: 'Legal' },
+      { value: 'Model', label: 'Model' },
+      {
+        value: 'Physical Safety',
+        label: 'Physical Safety'
+      },
+      { value: 'Reporting', label: 'Reporting' },
+      { value: 'Third Party', label: 'Third Party' },
+      { value: 'Execution', label: 'Execution' }
+    ]
+  },
+  {
+    value: 'Price Risk',
+    label: 'Price Risk',
+    children: [
+      { value: 'Banking Book', label: 'Banking Book' },
+      {
+        value: 'Foreign Exchange',
+        label: 'Foreign Exchange'
+      },
+      { value: 'Trading Book', label: 'Trading Book' }
+    ]
+  },
+  {
+    value: 'Reputational Risk',
+    label: 'Reputational Risk',
+    children: [
+      {
+        value: 'Brand Management',
+        label: 'Brand Management'
+      },
+      {
+        value: 'Relationship Management',
+        label: 'Relationship Management'
+      }
+    ]
+  },
+  {
+    value: 'Strategic Risk',
+    label: 'Strategic Risk',
+    children: [
+      {
+        value: 'Business Development',
+        label: 'Business Development'
+      },
+      {
+        value: 'Competitiveness',
+        label: 'Competitiveness'
+      },
+      { value: 'ESG', label: 'ESG' },
+      { value: 'Geopolitical', label: 'Geopolitical' },
+      { value: 'Regulatory', label: 'Regulatory' }
+    ]
+  },
+  {
+    value: 'Technology and Information Security',
+    label: 'Technology and Information Security',
+    children: [
+      { value: 'Software', label: 'Software' },
+      { value: 'Hardware', label: 'Hardware' },
+      { value: 'Systems', label: 'Systems' },
+      { value: 'Cyber', label: 'Cyber' },
+      { value: 'Innovation', label: 'Innovation' },
+      {
+        value: 'Physical Security',
+        label: 'Physical Security'
+      },
+      { value: 'Data', label: 'Data' }
+    ]
+  }
+]
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissEvent
+FileName:IncidentTable.vue
+FileSize:3553
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="incident-table">
+    <el-table
+      :data="tableData"
+      style="width: 100%; border-radius:10px;"
+      height="610"
+      :border="true"
+      stripe
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="index" width="50" />
+      <!-- Core Incident Information -->
+      <el-table-column prop="incidentNo" label="Incident Number" width="150" sortable />
+      <el-table-column prop="incidentType" label="Incident Type" width="130" />
+      <el-table-column prop="incidentTitle" label="Title" width="200" show-overflow-tooltip />
+      <el-table-column prop="incidentDescription" label="Description" width="300" show-overflow-tooltip />
+      <!-- Status and Risk -->
+      <el-table-column prop="incidentStatus" label="Status" width="120">
+        <template slot-scope="scope">
+          <el-tag :type="getIncidentStatusType(scope.row.incidentStatus)">{{ scope.row.incidentStatus }}</el-tag>
+        </template>
+      </el-table-column>
+
+
+      <!-- Risk Types -->
+      <el-table-column prop="ownerDepartment" label="Owner Department" width="150" show-overflow-tooltip />
+      <el-table-column prop="identificationDate" label="Identification Date" width="200" sortable />
+      <el-table-column prop="primaryRiskType" label="Primary Impacted Risk Area" width="210" show-overflow-tooltip />
+      <!-- <el-table-column prop="primaryLevelIIRisk" label="Primary Level II Risk" width="150" show-overflow-tooltip /> -->
+      <!-- <el-table-column prop="secondaryRiskType" label="Secondary Risk Type" width="200" show-overflow-tooltip /> -->
+      <!-- <el-table-column prop="secondaryLevelIIRisk" label="Secondary Level II Risk" width="150" show-overflow-tooltip /> -->
+
+      <!-- Dates -->
+      <el-table-column prop="occurrenceDate" label="Occurrence Date" width="150" sortable />
+      
+      <!-- <el-table-column prop="dueDate" label="Due Date" width="150" sortable /> -->
+      <!-- <el-table-column prop="recoveryDate" label="Recovery Date" width="150" sortable /> -->
+
+      <!-- Ownership -->
+      
+      <!-- <el-table-column prop="primaryOwnerDept" label="Primary Owner Dept" width="150" show-overflow-tooltip /> -->
+      <!-- <el-table-column prop="secondaryOwnerDept" label="Secondary Owner Dept" width="200" show-overflow-tooltip /> -->
+      <el-table-column prop="identifiedBy" label="Identified By" width="120" />
+
+      
+
+    </el-table>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'IncidentTable',
+  props: {
+    tableData: {
+      type: Array,
+      required: true
+    }
+  },
+  methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+
+    getRiskRatingType(rating) {
+      const types = {
+        HIGH: 'danger',
+        MEDIUM: 'warning',
+        LOW: 'success'
+      }
+      return types[rating] || 'info'
+    },
+    getIncidentStatusType(incidentStatus) {
+      const types = {
+        Open: 'warning',
+        'Pending Closure Approval': 'primary',
+        Closed: 'success'
+      }
+      return types[incidentStatus] || 'info'
+    }
+  }
+}
+</script>
+
+<style scoped>
+.incident-table {
+  margin: 20px;
+}
+.el-tag {
+  margin-right: 5px;
+}
+
+.el-table {
+  ::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.el-table {
+  ::-webkit-scrollbar-thumb {
+    background-color: #B0E0E6;
+    border-radius: 15px;
+  }
+}
+
+.force-scrollbar /deep/ .el-table__body-wrapper {
+  overflow-y: scroll !important;
+}
+
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissEvent
+FileName:index.vue
+FileSize:12223
+<<<BEGIN_CONTENT>>>
+<template>
+  <el-row>
+    <el-row>
+
+      <el-col>
+
+        <div class="section-class">
+          <!-- <el-card class="filter-card" shadow="hover"> -->
+          <el-card style="border-radius: 15px; background-color:#ffffff">
+          <div slot="header" class="card-header">
+            <span class="title">Filters</span>
+          </div>
+          
+          <el-row style="height: 40px;">
+
+
+            <el-form :model="filterForm" :inline="true" size="small" class="filter-form">
+
+                <el-col :span="4">
+                  <el-form-item class="keyword-input">
+                      <div class="search-input-group">
+                        <el-input clearable v-model="filterForm.keyword" :placeholder="'Enter keyword'" style="width: 250px;"/>
+                      </div>
+                    </el-form-item>
+                </el-col>
+
+                <el-col :span="4">
+                  <el-form-item label="From Date:">
+                    <el-date-picker :clearable="false" v-model="filterForm.fromDate" type="date" placeholder="Please select start time" style="width:150px;" />
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="4">
+                  <el-form-item label="To Date:">
+                    <el-date-picker :clearable="false" v-model="filterForm.toDate" type="date" placeholder="Please select end time" style="width:150px;" />
+                  </el-form-item>
+                </el-col>
+                
+                <el-col :span="4">
+                  <el-form-item label="Risk Type:">
+                    <el-select v-model="filterForm.riskType" filterable clearable placeholder="Select" style="width:150px">
+                      <el-option
+                        v-for="option in riskTypeOpts"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="4">
+                  <el-form-item label="Owner Dept:">
+                    <el-select v-model="filterForm.ownerDept" filterable clearable placeholder="Select" style="width:150px">
+                      <el-option
+                        v-for="option in ownerDeptOptions"
+                        :key="option.value"
+                        :label="option.label"
+                        :value="option.value"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+
+                <el-col :span="4">
+                <el-form-item>
+                  <el-col>
+                    <el-button icon="el-icon-download" size="small" :loading="exportLoading" @click="handleExport" style="width:210px; background: #B0E0E6">Export</el-button>
+                  </el-col>
+                </el-form-item>
+                </el-col>
+            </el-form>
+          </el-row>
+        </el-card>
+      </div>
+
+      </el-col>
+    </el-row>
+
+    <el-row>
+      <div class="section-class">
+        <el-card style="border-radius: 15px; background-color:#c3c6c7">
+          <transition name="fade" mode="out-in">
+            <incident-table :table-data="tableData" />
+          </transition>
+        </el-card>
+      </div>
+    </el-row>
+  </el-row>
+
+</template>
+
+<script>
+import * as XLSX from 'xlsx'
+import IncidentTable from './IncidentTable.vue'
+import {
+  getIncidentList, getIncidentData
+} from '@/api/mra'
+
+import {
+  STATUS_ITEMS,
+  DUE_DATE_OPTIONS,
+  RISK_RATING_OPTIONS,
+  OWNER_DEPT_OPTIONS,
+  RISK_TYPE_OPTIONS,
+  RISK_TYPE_OPTS
+} from './constants'
+
+export default {
+  name: 'Incident',
+
+  components: {
+    IncidentTable
+  },
+
+  data() {
+    return {
+      tableData: [],
+      TABLE_DATA: [],
+      loading: false,
+      selectedIncident: null,
+      isEditMode: false,
+      showForm: false,
+      exportLoading: false,
+      filterForm: {
+        keyWord: '',
+        fromDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+        toDate: new Date(),
+        dueDate: '',
+        ownerDept: '',
+        riskType: ''
+      },
+      queryParams: {
+        identificationDateFrom: '',
+        identificationDateTo: '',
+        ownerDept:'',
+        primaryRiskType:''
+      },
+      statusItems: STATUS_ITEMS,
+      dueDateOptions: DUE_DATE_OPTIONS,
+      ownerDeptOptions: OWNER_DEPT_OPTIONS,
+      riskTypeOptions: RISK_TYPE_OPTIONS,
+      riskTypeOpts: RISK_TYPE_OPTS
+    }
+  },
+
+  watch: {
+    filterForm: {
+      handler: 'applyFilters',
+      deep: true
+    }
+  },
+
+  created() {
+    this.fetchIncidents()
+  },
+
+  methods: {
+    async fetchIncidents(params = {}) {
+      try {
+        this.loading = true
+        const response = await getIncidentList(params)
+        this.tableData = response.data.map(row => {
+          return {
+            ...row,
+            identificationDate: row.identificationDate !== undefined ? row.identificationDate.split("T")[0] : row.identificationDate,
+            occurrenceDate: row.occurrenceDate !== undefined ? row.occurrenceDate.split("T")[0] : row.occurrenceDate,
+            dueDate: row.dueDate !== undefined ? row.dueDate.split("T")[0] : row.dueDate
+          }
+        })
+      this.TABLE_DATA = this.tableData
+      
+      // set to be empty
+      this.filterForm = {
+        keyWord: '',
+        dueDate: '',
+        riskRating: '',
+        ownerDept: '',
+        riskType: '',
+        fromDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+        toDate: new Date()
+      }
+
+      this.applyFilters()
+      } catch (error) {
+        console.error('Error fetching incidents:', error)
+        this.$message.error('Failed to fetch incidents')
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    applyFilters() {
+      let filteredData = this.TABLE_DATA
+
+
+      if (this.filterForm.fromDate) {
+        const t = new Date(this.filterForm.fromDate)
+        filteredData = filteredData.filter(item => (new Date(item.identificationDate.substring(0, 10)).toISOString().split("T")[0]) >= t.toISOString().split("T")[0])
+        this.queryParams.identificationDateFrom = t.toISOString().split("T")[0]
+      } else {
+        const t = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
+        this.filterForm.fromDate = new Date(Date.now() - 6 * 24 * 60 * 60 * 1000)
+        filteredData = filteredData.filter(item => (new Date(item.identificationDate.substring(0, 10)).toISOString().split("T")[0]) >= t.toISOString().split("T")[0])
+        this.queryParams.identificationDateFrom = t.toISOString().split("T")[0]
+      }
+
+      if (this.filterForm.toDate) {
+        const t = new Date(this.filterForm.toDate)
+        filteredData = filteredData.filter(item => (new Date(item.identificationDate.substring(0, 10)).toISOString().split("T")[0]) <= t.toISOString().split("T")[0])
+        this.queryParams.identificationDateTo = t.toISOString().split("T")[0]
+      } else {
+        const t = new Date()
+        this.filterForm.toDate = new Date(Date.now())
+        filteredData = filteredData.filter(item => (new Date(item.identificationDate.substring(0, 10)).toISOString().split("T")[0]) <= t.toISOString().split("T")[0])
+        this.queryParams.identificationDateTo = t.toISOString().split("T")[0]
+      }
+
+       if (this.filterForm.riskType) {
+        filteredData = filteredData.filter(item => item.primaryRiskType === this.filterForm.riskType)
+        this.queryParams.primaryRiskType = this.filterForm.riskType
+      }
+
+      // Apply owner department filter
+      if (this.filterForm.ownerDept) {
+        filteredData = filteredData.filter(item => item.ownerDepartment === this.filterForm.ownerDept)
+        this.queryParams.ownerDept = this.filterForm.ownerDept
+      }
+
+
+      // Apply keyword
+      if (this.filterForm.keyword) {
+        const keyword = this.filterForm.keyword.toLowerCase()
+        filteredData = filteredData.filter(row => {
+          return Object.entries(row).some(([key, value]) => {
+            if (value == null) return false
+            const stringValue = value.toString().toLowerCase()
+            return stringValue.includes(keyword)
+          })
+        })
+
+      }
+      this.tableData = filteredData
+    },
+    handleExport() {
+      const exportData = this.tableData.map(item => ({
+        'Incident No'    : item.incidentNo,
+        'Incident Type'    : item.incidentType,
+        'Status'    : item.incidentStatus,
+        'Occurrence Date'    : item.occurrenceDate,
+        'Identification Date'    : item.identificationDate,
+        'Title'    : item.incidentTitle,
+        'Incident Identifier Department'    : item.identifiedBy,
+        'Incident Owner Department'    : item.ownerDepartment,
+        'Description'    : item.incidentDescription,
+        'Primary Impacted Risk Area'    : item.primaryRiskType,
+        'IRM Primary Owner Dept'    : item.primaryOwnerDept,
+        'IRM Secondary Owner Dept'    : item.secondaryOwnerDept
+      }))
+
+      const ws = XLSX.utils.json_to_sheet(exportData)
+      const wb = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')     
+      XLSX.writeFile(wb, 'IncidentManualExport.xlsx')  
+    },
+
+    createDownloadDom(data, name) {
+      const content = data
+      const fileName = name
+      const blob = new Blob([content], {
+        type: 'application/vnd.ms-excel'
+      }) // 新建blob对象
+      if ('download' in document.createElement('a')) {
+        // 非IE下载
+        const elink = document.createElement('a')
+        elink.download = fileName
+        elink.style.display = 'none'
+        elink.href = URL.createObjectURL(blob)
+        document.body.appendChild(elink)
+        elink.click()
+        URL.revokeObjectURL(elink.href) // 释放URL 对象
+        document.body.removeChild(elink)
+      } else {
+        // IE10+下载
+        navigator.msSaveBlob(blob, fileName)
+      }
+      this.$message({
+        message: 'Success',
+        type: 'success',
+        showClose: true
+      })
+    }
+  }
+}
+</script>
+
+<style scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+.left-column {
+  grid-column: 1 / 2;
+}
+
+.right-column {
+  grid-column: 2 / 3;
+}
+
+.status-card {
+  margin-bottom: 20px;
+  height: calc(100% - 20px);
+}
+
+.search-card {
+  margin-bottom: 20px;
+}
+
+.filter-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #909399;
+}
+
+.status-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.status-item {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.status-button {
+  width: 100%;
+  text-align: left;
+}
+
+.status-active {
+  background-color: #f5f7fa;
+}
+
+.status-counts {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.count-item {
+  font-size: 14px;
+  color: #606266;
+}
+
+.search-form {
+  display: flex;
+  justify-content: space-between;
+  height:70px;
+}
+
+.keyword-input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.search-button {
+  margin-left: 0;
+}
+
+.search-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.hover-effect:hover {
+  background-color: #f5f7fa;
+}
+
+.is-selected {
+  background-color: #e6f7ff;
+  border-color: #91d5ff;
+  color: #409eff;
+}
+
+.right-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-card,
+.filter-card {
+  flex: 1;
+}
+
+.search-form {
+  display: flex;
+  align-items: left;
+}
+
+.search-button {
+  margin-left: 0;
+  margin-top: 0;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+
+.section-class {
+  padding: 10px;
+}
+
+
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissMonitor
+FileName:index.vue
+FileSize:7576
+<<<BEGIN_CONTENT>>>
+<template>
+  <el-row :key="this.dataChanged">
+    <el-collapse v-model="this.$store.getters.activeNames" style="width:100%">
+      <el-collapse-item name="1" title="Detection Charts">
+        <el-row>
+          <el-col :span="18">
+            <div class="section-class">
+              <el-card style="border-radius: 15px; background-color:#c3c6c7">
+                <el-row>
+                  <div class="section-title">
+                    Task
+                  </div>
+                </el-row>
+                <el-row>
+                  <NearMissMonitor v-if="isGetData" :timeline-data="timelineData" :week-data="weekData" :quarter-data="quarterData" />
+                </el-row>
+              </el-card>
+            </div>
+          </el-col>
+          <el-col :span="6">
+            <div class="section-class">
+              <el-card style="border-radius: 15px; background-color:#c3c6c7">
+                <el-row>
+                  <div class="section-title">
+                    Trend
+                  </div>
+                </el-row>
+                <el-row>
+                  <el-row>
+                    <el-col>
+                      <div class="chart-div">
+                        <NearMissBarChart v-if="isGetData" :week-data="weekData" />
+                      </div>
+                    </el-col>
+                  </el-row>
+                  <el-row>
+                    <el-col>
+                      <div class="chart-div">
+                        <NearMissPieChart v-if="isGetData" :timeline-data="timelineData" />
+                      </div>
+                    </el-col>
+                  </el-row>
+                </el-row>
+              </el-card>
+            </div>
+          </el-col>
+        </el-row>
+      </el-collapse-item>
+    </el-collapse>
+    <el-row>
+      <NearMissTable v-if="this.$store.getters.tableName" :key="this.$store.getters.detection_id" :table-name="this.$store.getters.tableName" />
+    </el-row>
+  </el-row>
+</template>
+
+<script>
+
+import NearMissMonitor from '@/views/mra/nearMissMonitor/NearMissMonitor.vue'
+import NearMissPieChart from '@/views/mra/nearMissMonitor/NearMissPieChart.vue'
+import NearMissBarChart from '@/views/mra/nearMissMonitor/NearMissBarChart.vue'
+import NearMissTable from '@/views/mra/nearMissMonitor/NearMissTable.vue'
+import { getWeeklyDetections, getQuarterlyDetections } from '@/api/mra'
+
+export default {
+  name: 'NearMiss',
+  components: { NearMissBarChart, NearMissMonitor, NearMissPieChart, NearMissTable },
+  data() {
+    return {
+      timelineData: [],
+      weekData: [],
+      quarterData: [],
+      isGetData: false,
+      dataChanged: true
+    }
+  },
+  computed: {
+    trigger() {
+      return this.$store.getters.refresh
+    }
+  },
+  watch: {
+    trigger(newVal, oldVal) {
+      this.fetchData()
+    }
+  },
+  async created() {
+    this.fetchData()
+  },
+  methods: {
+    async fetchData() {
+          try {
+            console.log("re-execute")
+            this.$store.commit('changeTableName', '')
+            this.$store.commit('changeDetectionId', '')
+            this.$store.commit('changeActiveNames', ["1"])
+            const response = await getWeeklyDetections()
+            // console.log("Full response data:", JSON.stringify(response, null, 2))
+            const quarter_response = await getQuarterlyDetections()
+            if (!response.code || response.code !== 200) {
+              throw new Error('Invalid response code')
+            }
+            if (!response.data?.detections) {
+              throw new Error('Response detections filed missing')
+            }
+
+            if (!quarter_response.code || quarter_response.code !== 200) {
+              throw new Error('Invalid response code')
+            }
+
+            if (!quarter_response.data?.nearMissHistory) {
+              throw new Error('Response detections filed missing')
+            }
+
+            console.log(response.data.detections)
+            console.log(quarter_response.data.nearMissHistory)
+
+
+            const today = new Date().toLocaleDateString('en-CA')
+            this.timelineData = response.data.detections
+              .filter(item => {
+                if (!item.event_date) {
+                  console.error('Date Error!')
+                  return false
+                }
+                return item.event_date.startsWith(today)
+              })
+              .sort((a, b) => b.detection_id - a.detection_id)
+              .map(item => {
+                const requriedFields = ['detection_id', 'event_date', 'detection_status', 'near_miss_status', 'detection_dept', 'detection_desc']
+                const missingFields = requriedFields.filter(field => !item[field])
+                if (missingFields.length > 0) {
+                  throw new Error(`Item missing fields: ${missingFields.join(', ')}`, item)
+                }
+                return {
+                  title: `${item.detection_dept} ${item.detection_desc}, ID:${item.detection_id}`,
+                  timestamp: item.event_date,
+                  status: item.detection_status?.toLowerCase() || 'unknown',
+                  type: item.near_miss_status,
+                  department: item.detection_dept || 'unknown',
+                  description: item.detection_desc || 'No description available',
+                  detectionId: item.detecition_id
+                }
+              })
+
+            this.weekData = response.data.detections
+              .filter(item => {
+                if (!item.event_date) {
+                  console.error('Date error!')
+                  return false
+                }
+                return item.event_date
+              })
+              .sort((a, b) => b.detection_id - a.detection_id)
+              .map(item => {
+                const requriedFields = ['detection_id', 'event_date', 'detection_status', 'near_miss_status', 'detection_dept', 'detection_desc', 'create_time']
+                const missingFields = requriedFields.filter(field => !item[field])
+                if (missingFields.length > 0) {
+                  console.error(`Item missing fields: ${missingFields.join(', ')}`, item)
+                }
+                return {
+                  title: `${item.detection_dept} ${item.detection_desc}, ID:${item.detection_id}`,
+                  timestamp: item.event_date,
+                  eventdetail: item.create_time,
+                  status: item.detection_status?.toLowerCase() || 'unknown',
+                  type: item.near_miss_status,
+                  department: item.detection_dept || 'unknown',
+                  description: item.detection_desc || 'No description available',
+                  detectionId: item.detecition_id,
+                  createtime: item.create_time !== undefined ? item.create_time : 'No create time'
+                }
+              })
+
+            this.quarterData = quarter_response.data.nearMissHistory
+            this.isGetData = true
+            this.dataChanged =  !this.dataChanged
+          } catch (error) {
+            throw new Error('Failed to fetech detection data:', error)
+          }
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+.chart-div {
+  height: 100%;
+  padding: 20px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #0x52ba;
+  border-radius: 10px;
+  background-color:#c3c6c7;
+  height: 10px;
+}
+
+.section-class {
+  padding: 10px;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissMonitor
+FileName:NearMissBarChart.vue
+FileSize:3372
+<<<BEGIN_CONTENT>>>
+<template>
+  <el-card class="near-miss-bar-chart">
+    <div id="barChart" class="bar-chart" />
+  </el-card>
+</template>
+
+<script>
+import * as echarts from 'echarts'
+
+export default {
+  name: 'NearMissBarChart',
+  props: ['weekData'],
+  mounted: function() {
+    this.drawBar()
+  },
+
+  methods: {
+    getLast7Days() {
+      const last7Days = []
+      const today = new Date()
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today)
+        date.setDate(date.getDate() - i)
+        last7Days.push(date.toLocaleDateString('en-US'))
+      }
+      return last7Days
+    },
+
+    getX() {
+      let d = this.getLast7Days()
+      const last5Days = []
+      for (let i = 0; i < 7; i++) {
+        let td = new Date(Date.parse(d[i]))
+        if (td.getDay() >= 1 && td.getDay() <= 5) {
+          last5Days.push(d[i].substring(0, d[i].length - 5));
+        }
+      }
+      return last5Days
+    },
+
+
+    getData() {
+      const last7Days = this.getLast7Days()
+      let val = [0, 0, 0, 0, 0, 0, 0]
+      for (let i = 0; i < 7; i++) {
+        for (let j = 0; j < this.weekData.length; j++) {
+          let ttt = last7Days[i].split("/")
+          let tttt = ttt[2] + "-" + ttt[0].padStart(2, '0') + "-" + ttt[1].padStart(2, '0')
+          console.log("date reformatted" + tttt)
+          if (this.weekData[j]['timestamp'].startsWith(tttt) === true) {
+            if (this.weekData[j]['type'] !== '0' && this.weekData[j]['type'] !== '-') {
+              val[i] += Number(this.weekData[j]['type'])
+            }
+          }
+        }
+      }
+
+      const ret = [0, 0, 0, 0, 0]
+      let count = 0
+      for (let i = 0; i < 7; i++) {
+        let d = new Date(Date.parse(last7Days[i]))
+        if (d.getDay() >= 1 && d.getDay() <= 5) {
+          ret[count] = val[i]
+          count += 1;
+        }
+      }
+      return ret
+    },
+
+
+    getColor() {
+      return "rgb(136, 185, 249)"
+    },
+    drawBar() {
+      this.myChart = echarts.init(document.getElementById('barChart'))
+      this.myChart.setOption({
+        title: {
+          text: 'Weekly Near Miss Event Count',
+          x: 'center',
+          textStyle: {
+            fontSize: 15
+          }
+        },
+        
+        xAxis: {
+          data: this.getX(),
+          axisLabel: {
+                textStyle: {
+                  fontWeight: 'bolder'
+                }
+              }
+        },
+        yAxis: {
+          minInterval: 1,
+          axisLabel: {
+                textStyle: {
+                  fontWeight: 'bolder'
+                }
+              }
+        },
+        tooltip: {textStyle: {
+            fontWeight: 'bolder'
+          }},
+        series: [
+          {
+            type: 'bar',
+            data: this.getData(),
+            color: this.getColor(),
+            itemStyle: {
+              barBorderRadius: 15,
+              borderWidth: 1,
+              borderType: 'solid',
+              shadowBlur: 9,
+              shadowColor: '#5470c6'
+            }
+          }
+        ]
+
+      })
+    }
+  }}
+</script>
+
+<style scoped>
+
+.near-miss-bar-chart {
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+}
+
+.bar-chart {
+  width:100%;
+  height:278px;
+    justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissMonitor
+FileName:NearMissMonitor.vue
+FileSize:16424
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="near-miss-monitor">
+    <el-row v-for="num in [0, 1]" :key="`row-${num}`" class="">
+      <el-col v-for="index in [0, 1, 2]" :key="`col-${num}-${index}`" :span="8">
+        <div class="data-div">
+            <el-card :class="[getCardClass(tags[num * 3 + index]), 'custom-card']">
+              
+                <el-row class="tag-name">
+                  <el-row style="height:50px;">
+                    <el-col :span=20>
+                      <el-row>
+                        Dept: {{ (tags[num * 3 + index] && parseDept(num * 3 + index)) || 'No Title' }}
+                      </el-row>
+                      <el-row>
+                        Desc: {{ (tags[num * 3 + index] && parseTitle(num * 3 + index)) || 'No Title' }}
+                      </el-row>
+                    </el-col>
+
+                    <el-col :span=4>
+                      <el-row v-if="parseDept(num * 3 + index)==='OSD' && (deptName === 'OSD' || userRole.includes('Admin') === true)">
+                        <near-miss-upload :task-indicator="parseID(num * 3 + index)" />
+                      </el-row>
+                    </el-col>
+                  </el-row>
+
+                  <el-divider></el-divider>
+
+                  <el-row style="background:#BEBEBE">
+                      <el-col :span=8 style="font-size:12px">
+                        <u @click="setDetection(parseID(num * 3 + index))" class="detection-link">Latest Detection:</u>
+                      </el-col>
+
+                      <el-col :span=5 style="font-size:12px">
+                        {{ getLastestDetectionDate(num * 3 + index) }}
+                      </el-col>
+                      <el-col :span=3 style="font-size:12px">
+                        {{ getLastestDetectiontime(num * 3 + index) }}
+                      </el-col>
+                      <el-col :span=6 :class="[getStatusClass(getLastestDetectionStatus(num * 3 + index))]" style="font-size:12px">
+                        {{ getLastestDetectionStatus(num * 3 + index) }}
+                      </el-col>
+                      <el-col :span=2 style="font-size:12px">
+                        {{ getLastestDetectionNum(num * 3 + index) }}
+                      </el-col>
+                      
+                  </el-row>
+
+                  <el-divider></el-divider>
+
+                 
+                  <el-row>
+                    <el-card style="border-radius: 15px;box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2); height:190px;">
+                      <div :id="'quarter' + getId(num * 3 + index)" class="quarter-chart" />
+                    </el-card>
+                  </el-row>
+
+                </el-row>
+              
+            </el-card>
+        </div>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+<script>
+import * as echarts from 'echarts'
+import NearMissUpload from './NearMissUpload.vue'
+
+export default {
+  name: 'NearMissMonitor',
+  props: ['timelineData', 'weekData', 'quarterData'],
+  components: { NearMissUpload },
+  data() {
+    return {
+      loadingStates: {},
+      selectedItem: null,
+      detectionResults: null
+    }
+  },
+  
+  computed: {
+
+    userRole() {
+      return this.$store.getters.roles[0]
+    },
+
+    deptName() {
+      return this.$store.getters.deptId
+    },
+
+    tags() {
+      return this.timelineData
+    },
+
+    getId(){
+      return function(index) {
+        return index.toString();
+      }
+    },
+
+    parseDept() {
+      return function(index) {
+        return this.timelineData[index]['title'].substring(0, 3);
+      }
+    },
+    
+    parseTitle() {
+      return function(index) {
+        const title_length = this.timelineData[index].title.length
+        return this.timelineData[index]['title'].substring(4, title_length - 8)
+      }
+    },
+
+    parseID() {
+      return function(index) {
+        const title_length = this.timelineData[index].title.length
+        return this.timelineData[index]['title'].substring(title_length - 6, title_length)
+      }
+    },
+
+    getLastestDetectionDate() {
+      return function(index) {
+        const title = this.timelineData[index].title
+        const detections = []
+        for (let i = 0; i  < this.weekData.length; i++) {
+          if (this.weekData[i].title === title && this.weekData[i].status !== 'not started') {
+            detections.push(this.weekData[i])
+          }
+        }
+        detections.sort((a, b) => {
+          let timeA = a.createtime;
+          let timeB = b.createtime;
+          if (timeA === 'No create time') {
+              timeA = '1900-01-01T00:00:00.000+00:00'
+          }
+          if (timeB === 'No create time') {
+            timeB = '1900-01-01T00:00:00.000+00:00'
+          }
+          if (timeA < timeB) {
+            return -1;
+          }
+          if (timeA > timeB) {
+            return 1;
+          }
+          return 0;
+        })
+        return detections[detections.length - 1].timestamp
+
+      }
+    },
+
+    getLastestDetectionNum() {
+      return function(index) {
+        const title = this.timelineData[index].title
+        let detections = []
+        for (let i = 0; i  < this.weekData.length; i++) {
+          if (this.weekData[i].title === title && this.weekData[i].status !== 'not started') {
+            detections.push(this.weekData[i])
+          }
+        }
+        detections.sort((a, b) => {
+          let timeA = a.createtime;
+          if (timeA === 'No create time') {
+              timeA = '1900-01-01T00:00:00.000+00:00'
+          }
+          let timeB = b.createtime;
+          if (timeB === 'No create time') {
+            timeB = '1900-01-01T00:00:00.000+00:00'
+          }
+          if (timeA < timeB) {
+            return -1;
+          }
+          if (timeA > timeB) {
+            return 1;
+          }
+          return 0;
+        })
+        return detections[detections.length - 1].type
+
+      }
+    },
+
+
+    getLastestDetectionStatus() {
+      return function(index) {
+        const title = this.timelineData[index].title
+        let detections = []
+        for (let i = 0; i  < this.weekData.length; i++) {
+          if (this.weekData[i].title === title && this.weekData[i].status !== 'not started') {
+            detections.push(this.weekData[i])
+          }
+        }
+        detections.sort((a, b) => {
+          let timeA = a.createtime;
+          if (timeA === 'No create time') {
+              timeA = '1900-01-01T00:00:00.000+00:00'
+          }
+          let timeB = b.createtime;
+          if (timeB === 'No create time') {
+            timeB = '1900-01-01T00:00:00.000+00:00'
+          }
+          if (timeA < timeB) {
+            return -1;
+          }
+          if (timeA > timeB) {
+            return 1;
+          }
+          return 0;
+        })
+        return detections[detections.length - 1].status
+
+      }
+    },
+
+    getLastestDetectiontime() {
+      return function(index) {
+        const title = this.timelineData[index].title
+        let detections = []
+        for (let i = 0; i  < this.weekData.length; i++) {
+          if (this.weekData[i].title === title && this.weekData[i].status !== 'not started') {
+            detections.push(this.weekData[i])
+          }
+        }
+        detections.sort((a, b) => {
+            let timeA = a.createtime;
+            if (timeA === 'No create time') {
+              timeA = '1900-01-01T00:00:00.000+00:00'
+            }
+            let timeB = b.createtime;
+            if (timeB === 'No create time') {
+              timeB = '1900-01-01T00:00:00.000+00:00'
+            }
+            if (timeA < timeB) {
+              return -1;
+            }
+            if (timeA > timeB) {
+              return 1;
+            }
+            return 0;
+          })
+        return detections[detections.length - 1].createtime.substring(11, 16)
+
+      }
+    }
+  },
+
+  mounted: function() {
+      this.drawBar()
+  },
+
+  methods: {
+
+    setDetection(id) {
+      this.$store.commit('changeTableName', 'IMP_DETECTION')
+      this.$store.commit('changeDetectionId', id.substring(3, id.length))
+      this.$store.commit('changeActiveNames', [])
+    },
+  
+    getCurrentQuarter() {
+      const now = new Date();
+      const month = now.getMonth();
+      const quarter = Math.floor(month / 3) + 1;
+      return "Q" + quarter.toString();
+    },
+
+    getPrevious1Quarter() {
+      const now = new Date();
+      const month = now.getMonth();
+      let quarter = Math.floor(month / 3) + 1;
+      quarter = quarter - 1
+      if (quarter <= 0) {
+        quarter = quarter + 4
+      }
+      return "Q" + quarter.toString();
+    },
+
+    getPrevious2Quarter() {
+      const now = new Date();
+      const month = now.getMonth();
+      let quarter = Math.floor(month / 3) + 1;
+      quarter = quarter - 2
+      if (quarter <= 0) {
+        quarter = quarter + 4
+      }
+      return "Q" + quarter.toString()
+    },
+
+    getPrevious3Quarter() {
+      const now = new Date();
+      const month = now.getMonth();
+      let quarter = Math.floor(month / 3) + 1;
+      quarter = quarter - 3
+      if (quarter <= 0) {
+        quarter = quarter + 4
+      }
+      return "Q" + quarter.toString();
+    },
+
+    getPrevious4Quarter() {
+      const now = new Date();
+      const month = now.getMonth();
+      let quarter = Math.floor(month / 3) + 1;
+      quarter = quarter - 4
+      if (quarter <= 0) {
+        quarter = quarter + 4
+      }
+      return "Q" + quarter.toString()
+    },
+
+    getCurrentMonth() {
+      const now = new Date();
+      let month = now.getMonth();
+      return month.toString()
+    },
+
+    getCurrentMonth() {
+      const now = new Date();
+      let month = now.getMonth() + 1;
+      return month.toString()
+    },
+
+    getPrev1Month() {
+      const now = new Date();
+      let month = now.getMonth() + 1- 1;
+      if (month <= 0) {
+        month = month + 12
+      }
+      return month.toString()
+    },
+
+    getPrev2Month() {
+      const now = new Date();
+      let month = now.getMonth() + 1 - 2;
+      if (month <= 0) {
+        month = month + 12
+      }
+      return month.toString()
+    },
+
+    getPrev3Month() {
+      const now = new Date();
+      let month = now.getMonth() + 1 - 3;
+      if (month <= 0) {
+        month = month + 12
+      }
+      return month.toString()
+    },
+
+    getPrev4Month() {
+      const now = new Date();
+      let month = now.getMonth() + 1 - 4;
+      if (month <= 0) {
+        month = month + 12
+      }
+      return month.toString()
+    },
+
+    getPrev5Month() {
+      const now = new Date();
+      let month = now.getMonth() + 1 - 5;
+      if (month <= 0) {
+        month = month + 12
+      }
+      return month.toString()
+    },
+
+    
+    drawBar() {
+      for (let num of [0, 1]) {
+        for (let index of [0, 1, 2]) {
+          let id = num * 3 + index;
+          this.myChart = echarts.init(document.getElementById('quarter' + id.toString()))
+          let current = this.timelineData[id]
+          let current_id = current.title.substring(current.title.length - 3, current.title.length)
+          // console.log(this.quarterData[current_id])
+          let x_axis_label = []
+          if (this.quarterData[current_id].length !== 6) {
+            x_axis_label.push(this.getPrevious4Quarter(), this.getPrevious3Quarter(), this.getPrevious2Quarter(), this.getPrevious1Quarter(), this.getCurrentQuarter())
+            
+            this.myChart.setOption({
+            backgroundColor: "rgb(255, 255, 255)",
+            title: {
+              left: 'center',
+              text: 'Quarterly Historical Data',
+              textStyle: {
+                fontSize: 13
+              }
+            },
+            xAxis: {
+              type: 'category',
+              data: x_axis_label,
+              axisLabel: {
+                textStyle: {
+                  fontWeight: 'bolder'
+                }
+              }
+            },
+            yAxis: {
+              minInterval: 1,
+              type: 'value',
+              axisLabel: {
+                show: true,
+                textStyle: {
+                  fontWeight: 'bolder'
+                }
+              }
+            },
+            tooltip: {},
+            series: [
+              {
+                type: 'line',
+                data: this.quarterData[current_id],
+                smooth: true,
+                lineStyle: {
+                  width: 5,
+                },
+                symbolSize: 10,
+                itemStyle: {
+                  barBorderRadius: 15,
+                  borderWidth: 1,
+                  borderType: 'solid',
+                  shadowBlur: 9,
+                  shadowColor: '#5470c6'
+                }
+              }
+            ]
+
+          })
+          } else {
+            x_axis_label = [this.getPrev5Month(), this.getPrev4Month(), this.getPrev3Month(), this.getPrev2Month(), this.getPrev1Month(), this.getCurrentMonth()]
+            this.myChart.setOption({
+            backgroundColor: "rgb(255, 255, 255)",
+            title: {
+              left: 'center',
+              text: 'Monthly Historical Data',
+              textStyle: {
+                fontSize: 13
+              }
+            },
+            xAxis: {
+              type: 'category',
+              data: x_axis_label,
+              axisLabel: {
+                textStyle: {
+                  fontWeight: 'bolder'
+                }
+              }
+            },
+            yAxis: {
+              minInterval: 1,
+              type: 'value',
+              axisLabel: {
+                show: true,
+                textStyle: {
+                  fontWeight: 'bolder'
+                }
+              }
+            },
+            tooltip: {},
+            series: [
+              {
+                type: 'line',
+                data: this.quarterData[current_id],
+                smooth: true,
+                lineStyle: {
+                  width: 5,
+                },
+                symbolSize: 10,
+                itemStyle: {
+                  barBorderRadius: 15,
+                  borderWidth: 1,
+                  borderType: 'solid',
+                  shadowBlur: 9,
+                  shadowColor: '#5470c6'
+                }
+              }
+            ]
+
+          })
+          }
+
+          
+        }
+      }
+    },
+
+    getStatusClass(item) {
+      return item === 'successful' ? 'successStatus' :
+            item === 'failed' ? 'dangerStatus' : 'dangerStatus';
+    },
+
+
+    getCardClass(item) {
+      return item.status === 'successful' ? 'success':
+            item.status === 'failed' ? 'danger':
+            item.status === 'not started' ? 'default' : 'default';
+    },
+
+    getTagType(status) {
+      if (!status) return 'default'
+      return {
+        successful: 'success',
+        failed: 'danger',
+        not_started: 'info'
+      }[status] || 'default'
+    }
+  }
+}
+</script>
+
+<style scoped>
+
+.custom-card {
+  white-space: normal;
+  word-break: break-word;
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.successStatus {
+  color : rgba(26, 121, 68, 0.8);
+}
+
+.dangerStatus {
+  color: #f56c6c;
+}
+
+
+.success {
+  background: linear-gradient(#add3ca, transparent);
+  border-radius: 15px;
+}
+
+.danger {
+  background: linear-gradient(#ea949e, transparent);
+  border-radius: 15px;
+}
+
+.default {
+  background-color: rgb(233, 233, 235);
+  border-radius: 15px;
+}
+
+.data-div {
+  height: 100%;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.near-miss-monitor-row {
+  display: flex;
+  flex-wrap: wrap;
+
+}
+
+.tag-name {
+  font-size: small;
+  font-weight: bold;
+  height: 278px;
+  border-color: transparent;
+}
+
+.quarter-chart {
+  width: 100%;
+  height: 180px;
+  padding: 5px;
+
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  border-radius: 15px;
+  background-color: #ffffff;
+}
+
+.el-divider--horizontal {
+  margin: 8px 0;
+  background: 0 0;
+  border-top: 1px dashed #000000;
+}
+
+.detection-link {
+  color: blue;
+  text-decoration:underine;
+  cursor: pointer;
+}
+
+.detection-link:hover {
+  color: white;
+  text-decoration: none;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissMonitor
+FileName:NearMissPieChart.vue
+FileSize:3548
+<<<BEGIN_CONTENT>>>
+<template>
+  <el-card class="near-miss-pie-chart">
+    <div id="pieChart" class="pie-chart" />
+    <div class="pie-line">
+      <el-row>
+        <el-col :span=8 style="background:#add3ca; border-radius:15px;" class="line-section"><a>Successful:{{this.getSuccessfulNum()}}</a></el-col>
+        <el-col :span=8 style="background:#ea949e; border-radius:15px;" class="line-section"><a>Failed: {{this.getFailedNum()}}</a></el-col>
+        <el-col :span=8 style="background:rgb(233, 233, 235); border-radius:15px" class="line-section"><a>Not Started: {{this.getNotStartedNum()}}</a></el-col>
+      </el-row>
+    </div>
+  </el-card>
+</template>
+
+<script>
+import * as echarts from 'echarts'
+
+export default {
+  name: 'NearMissPieChart',
+  props: ['timelineData'],
+  mounted: function() {
+    this.drawPie()
+  },
+  methods: {
+    getValue() {
+      return [
+        { name: 'Successful', value: this.getSuccessfulNum() },
+        { name: 'Failed', value: this.getFailedNum() },
+        { name: 'Not Started', value: this.getNotStartedNum() }
+      ]
+    },
+    getSucccessfulColor() {
+      return "#add3ca"
+    },
+    getFailedColor() {
+      return "#ea949e"
+    },
+    getNotStartedColor() {
+      return "rgb(233, 233, 235)"
+    },
+    getSuccessfulNum() {
+      let ret = 0
+      for (let i = 0; i < this.timelineData.length; i++) {
+        if (this.timelineData[i]['status'] === 'successful') {
+          ret += 1
+        }
+      }
+      return ret
+    },
+    getFailedNum() {
+      let ret = 0
+      for (let i = 0; i < this.timelineData.length; i++) {
+        if (this.timelineData[i]['status'] === 'failed') {
+          ret += 1
+        }
+      }
+      return ret
+    },
+    getNotStartedNum() {
+      let ret = 0
+      for (let i = 0; i < this.timelineData.length; i++) {
+        if (this.timelineData[i]['status'] === 'not started') {
+          ret += 1
+        }
+      }
+      return ret
+    },
+    drawPie() {
+      this.myChart = echarts.init(document.getElementById('pieChart'))
+      this.myChart.setOption({
+        title: {
+          text: 'Daily Task Status',
+          x: 'center',
+          textStyle: {
+            fontSize: 15
+          }
+        },
+        tooltip: {
+          tigger: 'item',
+          formatter: '{a} <br/>{b}: {c} ({d}%)',
+          textStyle: {
+            fontWeight: 'bolder'
+          }
+        },
+        color: [this.getSucccessfulColor(), this.getFailedColor(), this.getNotStartedColor()],
+        series: [
+          {
+            name: 'Daily Task Status',
+            type: 'pie',
+            radius: '57%',
+            center: ['50%', '50%'],
+            data: this.getValue(),
+            radius: ["60%", "50%"],
+            itemStyle: {
+              barBorderRadius: 15,
+              borderWidth: 1,
+              borderType: 'solid',
+              shadowBlur: 9,
+              shadowColor: '#5470c6'
+            },
+            label: {
+              fontWeight: 'bolder'
+            }
+          }
+        ]
+
+      })
+    }
+  }}
+</script>
+
+<style scoped>
+
+.pie-chart {
+  width: 100%;
+  height: 258px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.pie-line {
+  height: 20px;
+  
+  border-radius: 15px;
+  font-size: small;
+  font-weight: bold;
+}
+
+.near-miss-pie-chart {
+  box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+}
+
+.line-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissMonitor
+FileName:NearMissTable.vue
+FileSize:7629
+<<<BEGIN_CONTENT>>>
+<template>
+    <div class="section-class">
+        <el-row>
+        <el-card style="border-radius: 15px; background-color:#c3c6c7">
+            <el-row>
+                <el-col span="23">
+                <div class="section-title">
+                    Detection Historical Data
+                </div>
+                </el-col>
+                <el-col span="1">
+                    <el-button @click="handleClose"><el-icon name="close" /></el-button>
+                </el-col>
+          </el-row>
+            <el-row>
+                <div>
+                    <div>
+                        <el-input v-model="searchQuery" placeholder="Search..." clearable @clear="handleSearch" @input="handleSearch" />
+                    </div>
+                </div>
+
+                <el-table v-loading="loading" :data="filteredTableData" border>
+                    <el-table-column v-for="field in tableFields" :key="field.columnName" :prop="field.columnName" :label="formatLabel(field.columnName)" sortable />
+                </el-table>
+            </el-row>
+        </el-card>
+        </el-row>
+    </div>
+</template>
+
+<script>
+
+import { getTableMetadata, getTableData } from '@/api/mra'
+
+
+export default {
+    name: 'NearMissTable',
+    props: {
+        tableName: {
+            type: String,
+            required: true
+        }
+    },
+    data() {
+        return {
+            loading: false,
+            tableData: [],
+            tableFields: [],
+            searchQuery: '',
+            currentPage: 1,
+            pageSize: 10,
+            total: 0,
+            requiredFields: ["near_miss_status", "detection_status", "detection_dept", "detection_desc", "create_time"],
+            index: []
+        }
+    },
+    computed: {
+        filteredTableData() {
+            if (!this.searchQuery) return this.tableData;
+            return this.tableData.filter(row => {
+                return Object.values(row).some(value =>
+                    String(value).toLowerCase().includes(this.searchQuery.toLowerCase())
+                )
+            })
+
+        }
+    },
+    
+    created() {
+        this.initializeTable()
+    },
+
+    methods: {
+        handleClose() {
+            this.$store.commit('changeTableName', '')
+            this.$store.commit('changeDetectionId', '')
+            this.$store.commit('changeActiveNames', ["1"])
+        },
+        formatLabel(columnName) {
+             
+            const ret = columnName
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+            if (ret === 'Near Miss Status') {
+                return 'Near Miss Events Detected'
+            }
+            return ret
+        },
+
+        updateCreateTime(t) {
+            return t.substring(0, 10) + " " + t.substring(11, 16)
+        },
+
+        filterRequiredFields() {
+            const indices = this.tableFields.map((item, index) => this.requiredFields.includes(item.columnName) ? index : -1)
+            .filter(index => index !== -1)
+            this.index = indices
+            const selectedFieldName = this.index.map(ind => this.tableFields[ind])
+            this.tableFields = selectedFieldName
+            const filter_id = this.tableData.filter(obj => obj['detection_id'] === parseInt(this.$store.getters.detection_id))
+            this.tableData = filter_id
+            const filter_time = this.tableData.map(obj => {
+                return {
+                    ...obj,
+                    create_time: this.updateCreateTime(obj.create_time)
+                }
+            })
+            this.tableData = filter_time
+            const filteredData = this.tableData.filter(obj => this.requiredFields.every(key => key in obj));
+            this.tableData = filteredData
+        },
+
+        async initializeTable() {
+            try {                
+                this.loading = true
+                await this.fetchMetadata()
+                await this.fetchData()
+                // this.filterRequiredFields()
+            } catch (error) {
+                console.error('Error initializing table:', error)
+                this.$message({
+                    message: 'Failed to initialize table',
+                    type: 'error',
+                    duration: 5000
+                })
+            } finally {
+                this.loading = false
+            }
+        },
+        generateFormRules() {
+            const rules = {}
+            this.tableFields.forEach(field => {
+                if (field.nullable === false && field.columnName !== 'auto_id') {
+                    rules[field.columnName] = [{
+                        required: true,
+                        message: `${this.formatLabel(field.columnName)} is required`,
+                        trigger: 'blur'
+                    }]
+                }
+            })
+            this.formRules = rules
+        },
+    async fetchMetadata() {
+      try {
+        const response = await getTableMetadata(this.tableName)
+        if (response.code === 200) {
+          this.tableFields = response.data
+          this.generateFormRules()
+          const indices = this.tableFields.map((item, index) => this.requiredFields.includes(item.columnName) ? index : -1)
+            .filter(index => index !== -1)
+            this.index = indices
+            const selectedFieldName = this.index.map(ind => this.tableFields[ind])
+            this.tableFields = selectedFieldName
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch table metadata')
+        }
+      } catch (error) {
+        console.error('Error fetching metadata:', error)
+        this.$message({
+          message: 'Failed to fetch table metadata',
+          type: 'error',
+          duration: 5000
+        })
+        throw error
+      }
+    },
+
+    async fetchData() {
+      try {
+        const response = await getTableData(this.tableName, {
+          page: this.currentPage,
+          size: this.pageSize
+        })
+
+        if (response.code === 200) {
+          this.tableData = response.data.content
+          const filter_id = this.tableData.filter(obj => obj['detection_id'] === parseInt(this.$store.getters.detection_id))
+            this.tableData = filter_id
+            const filter_time = this.tableData.map(obj => {
+                return {
+                    ...obj,
+                    create_time: this.updateCreateTime(obj.create_time_ets)
+                }
+            })
+            this.tableData = filter_time
+            const filteredData = this.tableData.filter(obj => this.requiredFields.every(key => key in obj));
+            this.tableData = filteredData
+
+          this.total = this.tableData.length
+        } else {
+          this.$message.error(response.msg || 'Failed to fetch table data')
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        this.$message({
+          message: 'Failed to fetch table data',
+          type: 'error',
+          duration: 5000
+        })
+        throw error
+      }
+    },
+        handleSearch() {
+            this.currentPage = 1;
+            this.fetchData()
+            // this.filterRequiredFields()
+        },
+    }
+}
+</script>
+
+<style>
+.section-class {
+  padding: 10px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #0x52ba;
+  border-radius: 10px;
+  background-color:#c3c6c7;
+  height: 50px;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:mra\nearMissMonitor
+FileName:NearMissUpload.vue
+FileSize:11022
+<<<BEGIN_CONTENT>>>
+<template>
+  <div class="near-miss-upload">
+    <el-upload
+      class="upload-demo"
+      :action="false"
+      :http-request="httpRequest"
+      :on-preview="handlePreview"
+      :on-remove="handleRemove"
+      :before-upload="beforeUpload"
+      multiple
+      :limit="5"
+      :on-exceed="handleExceed"
+      :file-list="fileList">
+        <el-button><el-icon name="upload2" /></el-button>
+    </el-upload>
+    
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="dialogImageUrl" alt="">
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { uploadFiles } from '@/api/mra'
+import XLSX from 'xlsx'
+
+export default {
+  name: 'UploadFile',
+  props: ['taskIndicator'],
+  data() {
+    return {
+      fileList: [],
+      dialogImageUrl: '',
+      dialogVisible: false
+    };
+  },
+  methods: {
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(`You can only upload up to 5 files at once. 
+        ${files.length} files selected. 
+        ${files.length + fileList.length} files in total`);
+    },
+
+    
+    // author: wentao xu
+    // for excel format check
+    beforeUpload(file) {
+        if (process.env.VUE_APP_ENV === 'development') {
+            console.log("This is DEV env, skip the file validation")
+            return true
+        }
+
+      const isExceed1M = file.size / 1024 / 1024 > 1
+      if (isExceed1M) {
+        this.$message.warning('File size exceeds 1M')
+        return false
+      }
+
+        if (this.taskIndicator.substring(3, this.taskIndicator.length) === '106') {
+            if (!file.name.includes("QDII") && !file.name.includes("Recon") ) {
+                this.$message.error("For 106, filename must include QDII or Recon.")
+                return false;
+            }
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: "array"});
+
+                        if (!workbook.SheetNames.includes("Cover")) {
+                            this.$message.error("Excel file lacks Cover sheet.")
+                            return reject(false)
+                        }
+                        
+                        const sheet = workbook.Sheets["Cover"]
+                        const cellVal1 = sheet["A1"] ? sheet["A1"].v.trim() : "not exist"
+                        const cellVal2 = sheet["A5"] ? sheet["A5"].v.trim() : "not exist"
+
+                        if (cellVal1 === "BANK OF CHINA, NEW YORK BRANCH" && cellVal2 === "Reconciliation result Summary") {
+                            return resolve(true)
+                        } else {
+                            this.$message.error("A1 and A5 in Cover sheet doesn't have reuqired value.")
+                            return reject(false)
+                        }
+                    } catch (error) {
+                        this.$message.error("Excel Analysis failed.")
+                        return reject(false);
+                    }
+                }
+                reader.readAsArrayBuffer(file)
+            })
+        }
+        if (!file.name.includes("fed pos changes")) {
+            this.$message.error("For 105, filename must include fed pos changes.")
+            return false;
+        }
+        return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: "array"});
+
+                        if (!workbook.SheetNames.includes("MOVE")) {
+                            this.$message.error("Excel file lacks move sheet.")
+                            return reject(false)
+                        }
+
+                        // check each column name
+                        // author: wentao xu
+                        const sheet = workbook.Sheets["MOVE"]
+                        const cellVal1 = sheet["A1"] ? sheet["A1"].v : "not exist"
+                        if (cellVal1 !== "CUSIP") {
+                            this.$message.error("MOVE sheet lacks CUSIP")
+                            return reject(false)
+                        }
+                        const cellVal2 = sheet["B1"] ? sheet["B1"].v : "not exist"
+                        if (cellVal2 !== "BAL:") {
+                            this.$message.error("MOVE sheet lacks BAL:")
+                            return reject(false)
+                        }
+                        // const cellVal3 = sheet["C1"] ? sheet["C1"].v : "not exist"
+                        const cellVal4 = sheet["D1"] ? sheet["D1"].v : "not exist"
+                        if (cellVal4 !== "WDL:") {
+                            this.$message.error("MOVE sheet lacks WDL:")
+                            return reject(false)
+                        }
+                        const cellVal5 = sheet["E1"] ? sheet["E1"].v : "not exist"
+                        if (cellVal5 !== "DEP:") {
+                            this.$message.error("MOVE sheet lacks DEP:")
+                            return reject(false)
+                        }
+                        // const cellVal6 = sheet["F1"] ? sheet["F1"].v : "not exist"
+                        // const cellVal7 = sheet["G1"] ? sheet["G1"].v : "not exist"
+                        const cellVal8 = sheet["H1"] ? sheet["H1"].v : "not exist"
+                        if (cellVal8 !== "WDL-SELL") {
+                            this.$message.error("MOVE sheet lacks WDL-SELL")
+                            return reject(false)
+                        }
+                        const cellVal9 = sheet["I1"] ? sheet["I1"].v : "not exist"
+                        if (cellVal9 !== "DEP+BUY") {
+                            this.$message.error("MOVE sheet lacks DEP+BUY")
+                            return reject(false)
+                        }
+                        const cellVal10 = sheet["J1"] ? sheet["J1"].v : "not exist"
+                        if (cellVal10 !== "BAL-CLOSE") {
+                            this.$message.error("MOVE sheet lacks BAL-CLOSE")
+                            return reject(false)
+                        }
+                        // const cellVal11 = sheet["K1"] ? sheet["K1"].v : "not exist"
+                        const cellVal12 = sheet["L1"] ? sheet["L1"].v : "not exist"
+                        if (cellVal12 !== "CSDACCT") {
+                            this.$message.error("MOVE sheet lacks CSDACCT")
+                            return reject(false)
+                        }
+                        const cellVal13 = sheet["M1"] ? sheet["M1"].v : "not exist"
+                        if (cellVal13 !== "CUSIP") {
+                            this.$message.error("MOVE sheet lacks CUSIP")
+                            return reject(false)
+                        }
+                        const cellVal14 = sheet["N1"] ? sheet["N1"].v : "not exist"
+                        if (cellVal14 !== "ISIN") {
+                            this.$message.error("MOVE sheet lacks ISIN")
+                            return reject(false)
+                        }
+                        const cellVal15 = sheet["O1"] ? sheet["O1"].v : "not exist"
+                        if (cellVal15 !== "Open") {
+                            this.$message.error("MOVE sheet lacks Open")
+                            return reject(false)
+                        }
+                        const cellVal16 = sheet["P1"] ? sheet["P1"].v : "not exist"
+                        if (cellVal16 !== "Buy") {
+                            this.$message.error("MOVE sheet lacks Buy")
+                            return reject(false)
+                        }
+                        const cellVal17 = sheet["Q1"] ? sheet["Q1"].v : "not exist"
+                        if (cellVal17 !== "Sell") {
+                            this.$message.error("MOVE sheet lacks Sell")
+                            return reject(false)
+                        }
+                        const cellVal18 = sheet["R1"] ? sheet["R1"].v : "not exist"
+                        if (cellVal18 !== "Close") {
+                            this.$message.error("MOVE sheet lacks Close")
+                            return reject(false)
+                        }
+
+                        // ignore check number of rows
+                        // const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1})
+                        // const rowCount = sheetData.length
+                        
+                        // if (rowCount !== 94) {
+                        //     this.$message.error("Number of rows doesn't match the requirements.")
+                        //     return reject(false)
+                        // }
+
+                        // const columnA = sheetData.map(row => row[0]).filter(value => value !== undefined)
+                        // const uniqueValues = new Set()
+                        // ignore the duplicates check
+                        // const duplicates = columnA.filter(value => {
+                        //    if (uniqueValues.has(value)) {
+                        //        this.$message.error(`Duplicates found in column A:${value}`)
+                        //        return reject(false)
+                        //    }
+                        //    uniqueValues.add(value)
+                        // })
+
+                        
+                        return resolve(true)
+
+
+                    } catch (error) {
+                        this.$message.error("Excel file analysis failed.")
+                        return reject(false);
+                    }
+                }
+                reader.readAsArrayBuffer(file)
+            })
+    },
+
+
+    httpRequest(param) {
+      const formData = new FormData()
+      const _file = param.file
+      formData.append('file', _file)
+      return uploadFiles(formData)
+        .then(response => {
+          // Handle successful upload
+          this.$message.success('File uploaded successfully')
+          this.$store.commit('changeRefresh')
+        })
+        .catch(error => {
+          // Handle upload error
+          this.$message.error('Upload failed')
+          this.$store.commit('changeRefresh')
+        })
+    }
+  }
+};
+</script>
+
+<style>
+.upload-file {
+  margin: 20px;
+}
+.el-upload__tip {
+  color: #606266;
+  margin-top: 7px;
+}
+
+.el-button:hover {
+  color: #ffffff;
+  background: rgb(136, 185, 249);
+  border: #ffffff;
+}
+</style>
+<<<END_CONTENT>>>
+<<<END_FILE>>>
+<<<BEGIN_FILE>>>
+RelativePath:
+FileName:nearMiss.js
+FileSize:539
+<<<BEGIN_CONTENT>>>
+const state = {
+    tableName: '',
+    detection_id: '',
+    activeNames: ["1"],
+    refresh: 0
+}
+
+const mutations = {
+    changeTableName: (state, dept) => {
+        state.tableName = dept
+    },
+
+    changeDetectionId: (state, id) => {
+        state.detection_id = id
+    },
+
+    changeActiveNames: (state, an) => {
+        state.activeNames = an
+    },
+
+    changeRefresh: (state) => {
+        state.refresh += 1
+    } 
+}
+
+const actions = {
+
+}
+
+export default {
+    state,
+    mutations,
+    actions
+}
+<<<END_CONTENT>>>
+<<<END_FILE>>>
