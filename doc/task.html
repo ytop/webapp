@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRI Details - MIB-RAS-KRI-0001</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Redesign Proposal: New Visual Style (Color & Typography) */
+        :root {
+            --primary-color: #2A52A3;
+            --primary-hover: #224182;
+            --success-color: #28a745;
+            --success-hover: #218838;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --danger-hover: #c82333;
+            
+            --bg-color: #F8F9FC;
+            --card-bg-color: #ffffff;
+            --border-color: #DEE2E6;
+            --text-primary: #212529;
+            --text-secondary: #495057;
+            --text-muted: #6c757d;
+
+            --font-family: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-secondary);
+            font-size: 14px;
+            padding: 24px;
+        }
+
+        .page-container { max-width: 1600px; margin: 0 auto; }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .back-button {
+            font-size: 28px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-button:hover { color: var(--primary-color); }
+
+        .page-header h1 { font-size: 28px; font-weight: 700; color: var(--text-primary); }
+        .page-header .status-badge { transform: translateY(-2px); }
+
+        .card {
+            background: var(--card-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* Redesign Proposal: Two-Column Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px; /* Main content and right sidebar */
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .main-content { grid-column: 1 / 2; }
+        .contextual-sidebar { grid-column: 2 / 3; position: sticky; top: 24px; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Contextual Sidebar (Right Column) */
+        .detail-group { margin-bottom: 20px; }
+        .detail-group h4 {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .detail-group p { font-size: 14px; color: var(--text-secondary); }
+        
+        /* Redesign Proposal: Data Visualization Placeholder */
+        .chart-placeholder {
+            height: 150px;
+            background-color: #f8f9fa;
+            border: 1px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Main Content (Left Column) */
+        .kri-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .info-item .info-label { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+        .info-item .info-value { font-size: 16px; color: var(--text-primary); font-weight: 600; }
+        
+        .actions-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px; margin: 24px 0;
+        }
+        .actions-toolbar h3 { font-size: 16px; font-weight: 600; }
+        .actions-group { display: flex; gap: 12px; }
+
+        /* Redesigned Table */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table th { /* styles from index.html */ }
+        .data-table td { /* styles from index.html */ }
+
+        /* Redesigned Tabs */
+        .tab-bar {
+            display: flex; border-bottom: 1px solid var(--border-color); margin-bottom: 24px;
+        }
+        .tab {
+            padding: 10px 20px; font-size: 15px; font-weight: 500; cursor: pointer;
+            color: var(--text-muted); border: none; background: none;
+            border-bottom: 3px solid transparent; margin-bottom: -2px;
+        }
+        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Buttons and Badges (reusing styles from index.html) */
+        .btn { /* from index.html */ }
+        .status-badge { /* from index.html */ }
+        .status-active { background-color: rgba(13, 110, 253, 0.1); color: #0a58ca; }
+        .status-approved { background-color: rgba(40, 167, 69, 0.1); color: #155724; }
+        .status-pending { background-color: rgba(255, 193, 7, 0.15); color: #856404; }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-layout { grid-template-columns: 1fr; }
+            .contextual-sidebar { grid-column: 1 / -1; position: static; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="page-header">
+            <a href="index.html" class="back-button" title="Back to Dashboard">&larr;</a>
+            <h1>Economic Value at Risk</h1>
+            <span class="status-badge status-active">Active</span>
+        </div>
+
+        <div class="main-layout">
+            <div class="main-content">
+                <div class="card">
+                    <h2 class="section-title">KRI Value & Calculation</h2>
+                    <div class="kri-overview-grid">
+                        <div class="info-item">
+                            <span class="info-label">Calculated KRI Value</span>
+                            <span class="info-value">0.269</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Breach Status</span>
+                            <span class="info-value"><span class="status-badge status-approved">No Breach</span></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Breach Memo</span>
+                            <span class="info-value">N/A</span>
+                        </div>
+                    </div>
+
+                    <div class="actions-toolbar">
+                        <h3>Data Elements</h3>
+                        <div class="actions-group">
+                            <button class="btn btn-success">Approve Selected</button>
+                            <button class="btn btn-danger">Reject Selected</button>
+                        </div>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>Element</th>
+                                <th>Value</th>
+                                <th>Status</th>
+                                <th>Provider</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>Economic Value (Base)</td>
+                                <td>1,234,567</td>
+                                <td><span class="status-badge status-approved">Approved</span></td>
+                                <td>MRD</td>
+                                <td><span title="Comment">💬</span></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>Economic Value (+200 bps)</td>
+                                <td>1,100,000</td>
+                                <td><span class="status-badge status-approved">Approved</span></td>
+                                <td>MRD</td>
+                                <td><span title="Comment">💬</span></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td>Net Interest Income (Base)</td>
+                                <td>500,000</td>
+                                <td><span class="status-badge status-pending">Pending</span></td>
+                                <td>ERM</td>
+                                <td><span title="Comment">💬</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                     <div class="actions-toolbar">
+                        <h3>Confirm Final KRI Value</h3>
+                        <div class="actions-group">
+                            <button class="btn btn-success" id="yesBtn">Confirm</button>
+                            <button class="btn btn-danger" id="noBtn">Reject</button>
+                            <button class="btn btn-secondary" onclick="window.location.href='index.html'">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contextual-sidebar">
+                <div class="card">
+                    <h2 class="section-title">General Information</h2>
+                    <div class="detail-group">
+                        <h4>KRI ID</h4>
+                        <p>MIB-RAS-KRI-0001</p>
+                    </div>
+                    <div class="detail-group">
+                        <h4>Description</h4>
+                        <p>EVE risk is a traditional industry metric for economic value at risk for banks.</p>
+                    </div>
+                    <div class="detail-group">
+                        <h4>Formula</h4>
+                        <p>Absolute Value of (EVE for 200 bps shock - EVE for Base Case)</p>
+                    </div>
+                    <div class="detail-group">
+                        <h4>KRI Owner</h4>
+                        <p>ERM</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="section-title">Historical Trend</h2>
+                    <div class="chart-placeholder">
+                        Sparkline / Line Chart Area
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="tab-bar">
+                        <button class="tab active" data-tab="evidence">Evidence</button>
+                        <button class="tab" data-tab="audit-trail">Audit Trail</button>
+                    </div>
+                    <div id="evidence-content" class="tab-content active">
+                        <p>Evidence files and details will be listed here.</p>
+                    </div>
+                    <div id="audit-trail-content" class="tab-content">
+                        <p>A log of all actions and changes will be listed here.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-bar .tab');
+            const tabContents = document.querySelectorAll('.contextual-sidebar .tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetId + '-content') {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>
