@@ -35,12 +35,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Route to get all KRIs
-router.get('/all', (req, res) => {
-  console.log("GET /kri/all endpoint called")
-  const kris = kriService.getKRIs();
-  res.json(kris);
-});
+
 
 // Route to get all KRI tasks
 router.get('/alltasks', (req, res) => {
@@ -48,133 +43,6 @@ router.get('/alltasks', (req, res) => {
   const tasks = kriService.getKRITasks();
   console.log(`Returning ${tasks ? tasks.length : 0} KRI tasks`); // Use kriService for database interactions
   res.json(tasks || []);
-})
-
-/**
- * @route   GET /kri/:kriId
- * @desc    Get a specific KRI by ID
- */
-router.get('/:kriId', (req, res) => {
-  const { kriId } = req.params;
-  const kri = kriService.getKRIById(kriId);
-
-  if (!kri) {
-    return res.status(404).json({
-      success: false,
-      message: `KRI with ID ${kriId} not found`,
-    });
-  }
-
-  res.json(kri);
-})
-
-/**
- * @route   POST /kri/updateDescription
- * @desc    Update the description of a KRI
- */
-router.post('/updateDescription', (req, res, next) => {
-  const { kriId, newDescription } = req.query;
-  const kri = getKRIById(kriId);
-
-  if (!kri) {
-    return res.status(404).json({
-      success: false,
-      message: `KRI with ID ${kriId} not found`,
-    });
-  }
-
-  const updatedKRI = kriService.updateKRI(kriId, { kriDesc: newDescription });
-
-    res.json({
-        success: true,
-        message: 'Description updated successfully',
-        updatedKRI: {
-            id: kriId,
-            description: newDescription,
-        },
-    });
-})
-/**
- * @route   POST /kri/update
- * @desc    Update a KRI's data
- */
-router.post('/update', (req, res) => {
-  const { kriId } = req.query;
-  const kriData = req.body;
-
-  const kri = getKRIById(kriId);
-
-  if (!kri) {
-    return res.status(404).json({
-      success: false,
-      message: `KRI with ID ${kriId} not found`,
-    });
-  }
-
-  const updatedKRI = kriService.updateKRI(kriId, kriData);
-
-    res.json({
-        success: true,
-        message: 'KRI updated successfully',
-        updatedKRI,
-    });
-})
-
-/**
- * @route   POST /kri/uploadDocument
- * @desc    Upload a document for a specific KRI
- */
-router.post('/uploadDocument', upload.single('file'), (req, res, next) => {
-  const { kriId } = req.query;
-  const file = req.file;
-
-  if (!file) {
-    return res.status(400).json({
-      success: false,
-      message: 'No file uploaded.'
-    });
-  }
-
-  // Check if the KRI exists
-  const kri = kriService.getKRIById(kriId);
-  if (!kri) {
-    return res.status(404).json({
-      success: false,
-      message: `KRI with ID ${kriId} not found.`
-    });
-  }
-
-  // Construct the document object
-  try {
-    const document = {
-      name: file.originalname,
-      size: file.size,
-      type: file.mimetype,
-      url: `/uploads/${file.filename}`
-    };
-
-    // Save the document
-    const savedDocument = kriService.addDocument(kriId, document);
-    res.status(200).json({
-      success: true,
-      message: 'Document uploaded successfully.',
-      document: savedDocument
-    });
-  } catch (error) {
-    // Pass any errors to the error handling middleware
-    next(error);
-  }
-});
-
-/**
- * @route   GET /kri/:kriId/documents
- * @desc    Get all documents for a specific KRI
- */
-router.get('/:kriId/documents', (req, res) => {
-  const { kriId } = req.params;
-  const documents = kriService.getDocumentsByKRIId(kriId);
-
-  res.json(documents);
 })
 
 // ===== KRI Task Routes =====

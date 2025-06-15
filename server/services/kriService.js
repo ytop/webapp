@@ -19,15 +19,6 @@ db.defaults({
   documents: []
 }).write();
 
-// Helper functions for working with the database
-const getKRIs = () => db.get('kris').value();
-const getKRIById = (id) => db.get('kris').find({ kriId: id }).value();
-const updateKRI = (id, data) => {
-  return db.get('kris')
-    .find({ kriId: id })
-    .assign(data)
-    .write();
-};
 
 const getKRITasks = () => db.get('kriTasks').value();
 const getKRITaskById = (id) => db.get('kriTasks').find({ id }).value();
@@ -70,9 +61,6 @@ const getDocumentsByKRIId = (kriId) => {
 
 module.exports = {
   db,
-  getKRIs,
-  getKRIById,
-  updateKRI,
   getKRITasks,
   getKRITaskById,
   updateKRITask,

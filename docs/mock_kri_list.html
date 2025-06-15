@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRI Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            background-color: #f5f5f5;
+            padding: 10px;
+        }
+        
+        .dashboard-container {
+            background: white;
+            border: 2px solid #666;
+            padding: 15px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: #333;
+        }
+        
+        .form-group select, .form-group input {
+            padding: 4px;
+            border: 1px solid #ccc;
+            background: white;
+        }
+        
+        .status-list {
+            max-height: 80px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+            font-size: 11px;
+        }
+        
+        .status-list div {
+            margin-bottom: 2px;
+        }
+        
+        .filter-section {
+            margin-bottom: 15px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn {
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border-color: #6c757d;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+        
+        .data-table th {
+            background: #e9ecef;
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            font-size: 11px;
+        }
+        
+        .data-table td {
+            padding: 6px;
+            border: 1px solid #ddd;
+            font-size: 11px;
+            vertical-align: middle;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 60px;
+            display: inline-block;
+        }
+        
+        .status-submitted {
+            background: #17a2b8;
+        }
+        
+        .status-finalized {
+            background: #28a745;
+        }
+        
+        .breach-red {
+            background: #dc3545;
+        }
+        
+        .breach-amber {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .breach-green {
+            background: #28a745;
+        }
+        
+        .upload-btn {
+            background: #17a2b8;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .checkbox-col {
+            width: 30px;
+            text-align: center;
+        }
+        
+        .kri-id-col {
+            width: 60px;
+        }
+        
+        .kri-name-col {
+            width: 300px;
+        }
+        
+        .owner-col {
+            width: 80px;
+        }
+        
+        .status-col {
+            width: 120px;
+        }
+        
+        .type-col {
+            width: 100px;
+        }
+        
+        .breach-col {
+            width: 80px;
+        }
+        
+        .reporting-col {
+            width: 80px;
+        }
+        
+        .memo-col {
+            width: 100px;
+        }
+        
+        input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header Form Section -->
+        <div class="header-section">
+            <div class="form-group">
+                <label>KRI Owner</label>
+                <select>
+                    <option>Select Owner</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Collection Status</label>
+                <div class="status-list">
+                    <div>Pending Input</div>
+                    <div>Submitted to Data Provider Approver</div>
+                    <div>Data Provider Owner Approver</div>
+                    <div>Under Review</div>
+                    <div>Pending Breach Memo uploading</div>
+                    <div>Finalized</div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>L1 Risk Type</label>
+                <select>
+                    <option>Select Risk Type</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>KRI ID</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>Reporting Cycle</label>
+                <div>Monthly</div>
+                <div>Quarterly</div>
+            </div>
+            <div class="form-group">
+                <label>Reporting Date</label>
+                <input type="text" value="10/31/2024">
+            </div>
+            <div class="form-group">
+                <label>L2 Risk Type</label>
+                <select>
+                    <option>Select Risk Type</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>KRI Name</label>
+                <input type="text">
+            </div>
+            <div class="form-group">
+                <label>KRI Type</label>
+                <select>
+                    <option>Select Type</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Breach Type</label>
+                <div>No Breach</div>
+                <div>Warning Line Breach</div>
+                <div>Limit Breach</div>
+            </div>
+            <div class="form-group">
+                <label>Data Provider</label>
+                <select>
+                    <option>Select Provider</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-buttons">
+                <button class="btn btn-primary">Filter KRI</button>
+                <button class="btn btn-secondary">Reset Filters</button>
+                <button class="btn" style="background: #28a745; color: white;">📊</button>
+            </div>
+        </div>
+        
+        <!-- Data Table -->
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th class="checkbox-col">☐</th>
+                    <th class="kri-id-col">KRI ID</th>
+                    <th class="kri-name-col">KRI Name</th>
+                    <th class="owner-col">KRI Owner</th>
+                    <th class="status-col">Collection Status</th>
+                    <th class="type-col">KRI Type</th>
+                    <th class="type-col">L1 Risk Type</th>
+                    <th class="type-col">L2 Risk Type</th>
+                    <th class="breach-col">Breach Status</th>
+                    <th class="reporting-col">Reporting Cycle</th>
+                    <th class="memo-col">Breach Memo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="checkbox-col"><input type="checkbox"></td>
+                    <td>128</td>
+                    <td>Economic Value at Risk (+/-200 bps instantaneous and parallel shock)</td>
+                    <td>MRD</td>
+                    <td><span class="status-badge status-submitted">Submitted to Validator Approver</span></td>
+                    <td>RAS</td>
+                    <td>Interest Rate Risk</td>
+                    <td>Repricing; Basis; Yield Curve; Options</td>
+                    <td><span class="status-badge breach-red">Red</span></td>
+                    <td>Monthly</td>
+                    <td><a href="#" class="upload-btn">Breach Upload</a></td>
+                </tr>
+                <tr>
+                    <td class="checkbox-col"><input type="checkbox"></td>
+                    <td>129</td>
+                    <td>Net Interest Income at Risk (+/-200 bps instantaneous shocks)</td>
+                    <td>MRD</td>
+                    <td><span class="status-badge status-submitted">Submitted to Validator Approver</span></td>
+                    <td>RAS</td>
+                    <td>Interest Rate Risk</td>
+                    <td>Repricing; Basis; Yield Curve; Options</td>
+                    <td><span class="status-badge breach-amber">Amber</span></td>
+                    <td>Monthly</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="checkbox-col"><input type="checkbox"></td>
+                    <td>130</td>
+                    <td>Cumulative Gap Ratio (ratio of assets to liabilities maturing within 90 days)</td>
+                    <td>MRD</td>
+                    <td><span class="status-badge status-finalized">Finalized</span></td>
+                    <td>RAS</td>
+                    <td>Liquidity Risk</td>
+                    <td>Asset/Market Liquidity; Contingent Liquidity</td>
+                    <td><span class="status-badge breach-green">Green</span></td>
+                    <td>Monthly</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="checkbox-col"><input type="checkbox"></td>
+                    <td>127</td>
+                    <td>Cushion Above the Monthly Stress Test Defined Buffer (30 Days)</td>
+                    <td>MRD</td>
+                    <td><span class="status-badge status-finalized">Finalized</span></td>
+                    <td>RAS</td>
+                    <td>Liquidity Risk</td>
+                    <td>Asset/Market Liquidity; Contingent Liquidity</td>
+                    <td><span class="status-badge breach-green">Green</span></td>
+                    <td>Monthly</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td class="checkbox-col"><input type="checkbox"></td>
+                    <td>161</td>
+                    <td>Stressed Excess Intraday Liquidity Buffer Ratio</td>
+                    <td>MRD</td>
+                    <td><span class="status-badge status-finalized">Finalized</span></td>
+                    <td>Non-RAS</td>
+                    <td>Liquidity Risk</td>
+                    <td>Intraday Liquidity</td>
+                    <td><span class="status-badge breach-red">Red</span></td>
+                    <td>Monthly</td>
+                    <td><a href="#" class="upload-btn">Upload...</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

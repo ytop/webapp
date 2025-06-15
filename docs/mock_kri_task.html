@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRI Risk Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .main-info {
+            background-color: #e8f4fd;
+            padding: 16px 20px;
+            border-bottom: 1px solid #d0d7de;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 120px 180px 180px 180px 120px 120px 140px;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: #333;
+        }
+
+        .status-active {
+            background-color: #2196f3;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .general-section {
+            background-color: white;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .section-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "🔍";
+            margin-right: 8px;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-group h4 {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .detail-group p {
+            font-size: 13px;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #e0e0e0;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #666;
+        }
+
+        .kri-value-section {
+            background-color: white;
+            padding: 20px;
+            margin-top: 1px;
+        }
+
+        .value-grid {
+            display: grid;
+            grid-template-columns: 100px 180px 180px 120px 120px 120px 120px;
+            gap: 20px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .value-header {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .btn-yes {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .btn-no {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .related-content {
+            background-color: white;
+            padding: 20px;
+            margin-top: 1px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tab.active {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table td {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .delete-icon {
+            color: #e53e3e;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .status-na {
+            background-color: #9e9e9e;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            display: inline-block;
+        }
+
+        .upload-icon {
+            color: #ff9800;
+            font-size: 16px;
+        }
+
+        .breach-memo {
+            background-color: #f0f0f0;
+            color: #666;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Task
+    </div>
+
+    <div class="main-info">
+        <div class="info-row">
+            <div>
+                <div class="info-label">KRI ID</div>
+                <div class="info-value">MIB-RAS-KRI-0001 ⭐</div>
+            </div>
+            <div>
+                <div class="info-label">KRI Type</div>
+                <div class="info-value">RAS</div>
+            </div>
+            <div>
+                <div class="info-label">L1 Risk Type</div>
+                <div class="info-value">Interest Rate Risk</div>
+            </div>
+            <div>
+                <div class="info-label">L2 Risk Type</div>
+                <div class="info-value">Repricing: Basic Yield Curve; Options</div>
+            </div>
+            <div>
+                <div class="info-label">Reporting Cycle</div>
+                <div class="info-value">Monthly</div>
+            </div>
+            <div>
+                <div class="info-label">Reporting Date</div>
+                <div class="info-value">10/31/2024</div>
+            </div>
+            <div>
+                <div class="info-label">Collection Status</div>
+                <div class="status-active">Active</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="general-section">
+        <div class="section-title">General</div>
+        
+        <div class="details-grid">
+            <div class="detail-group">
+                <h4>KRI Name</h4>
+                <p>Economic Value at Risk (+200 bps instantaneous and parallel shock)</p>
+                
+                <h4 style="margin-top: 16px;">Description</h4>
+                <p>EVE risk is a traditional industry metric for economic value at risk for banks. It measures the variability of fair value of the bank's interest rate sensitive positions to various interest rate shocks. In this particular case, it is the variability of EVE under a 200 bps parallel and instantaneous shock scenario.</p>
+            </div>
+            
+            <div class="detail-group">
+                <h4>Formula</h4>
+                <p>Absolute Value of (EVE for 200 bps shock - EVE for Base Case)</p>
+                
+                <h4 style="margin-top: 16px;">KRI Owner</h4>
+                <div class="user-avatar">👤</div>
+                
+                <h4 style="margin-top: 16px;">Data Provider</h4>
+                <div class="user-avatar">👤</div>
+            </div>
+            
+            <div class="detail-group">
+                <h4>Expected Collection Date</h4>
+                <p>11/12/2024</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="kri-value-section">
+        <h3 style="margin-bottom: 16px; font-size: 14px; color: #333;">KRI Value</h3>
+        
+        <div class="value-grid">
+            <div class="value-header">KRI Value</div>
+            <div class="value-header">Data Elements Name</div>
+            <div class="value-header">Data Elements Value</div>
+            <div class="value-header">Breach Status</div>
+            <div class="value-header">Evidence Upload</div>
+            <div class="value-header">Comment</div>
+            <div class="value-header">Breach Memo</div>
+        </div>
+        
+        <div class="value-grid">
+            <div>-</div>
+            <div>N/A</div>
+            <div>N/A</div>
+            <div><span class="status-na">N/A</span></div>
+            <div><span class="upload-icon">📁</span></div>
+            <div>💬</div>
+            <div><span class="breach-memo">NON-BMEMO LEVEL</span></div>
+        </div>
+        
+        <div style="margin-top: 16px;">
+            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">Confirmation</div>
+            <div class="confirmation-buttons">
+                <button class="btn btn-yes">Yes</button>
+                <button class="btn btn-no">No</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="related-content">
+        <div style="background-color: #e8f4fd; padding: 8px 12px; border-radius: 4px; display: inline-block; margin-bottom: 16px; font-size: 12px; color: #2196f3;">
+            All Related Info
+        </div>
+        
+        <div class="tab-bar">
+            <button class="tab active">Evidence</button>
+            <button class="tab">Breach Memo</button>
+            <button class="tab">KRI Change Log</button>
+            <button class="tab">Audit Trail</button>
+            <button class="tab">Related Issue</button>
+        </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>KRI ID</th>
+                    <th>Atomic ID</th>
+                    <th>Uploaded Time</th>
+                    <th>User Name</th>
+                    <th>User Role</th>
+                    <th>File Name</th>
+                    <th>File Size_KB</th>
+                    <th>Delete</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>17</td>
+                    <td>0</td>
+                    <td>10/05/2024</td>
+                    <td>Liu, Louis</td>
+                    <td>Data Provider Inputter</td>
+                    <td>MRD confirmation.msg</td>
+                    <td>125KB</td>
+                    <td><span class="delete-icon">❌</span></td>
+                    <td>⬜</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>0</td>
+                    <td>10/05/2024</td>
+                    <td>Liu, Louis</td>
+                    <td>Data Provider Inputter</td>
+                    <td>MRD 202411 30 KRI file.xlsx</td>
+                    <td>200KB</td>
+                    <td><span class="delete-icon">❌</span></td>
+                    <td>⬜</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

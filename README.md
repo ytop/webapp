@@ -43,25 +43,10 @@ cd client && npm install
 cd server && npm install
 ```
 
-### Fixing Node.js v20 Compatibility Issues
-
-If you encounter issues with fsevents or other dependencies when using Node.js v20, run the fix script:
-
-```bash
-./fix-dependencies.sh
-```
-
-This script will reinstall the dependencies with the correct versions and configurations for Node.js v20 compatibility.
 
 ### Development
 
-To start both the client and server in development mode:
-
-```bash
-npm run dev
-```
-
-Or start them separately:
+Start server and client separately:
 
 ```bash
 # Start client (Vue.js)
@@ -71,26 +56,11 @@ npm run client
 npm run server
 ```
 
-### Production Build
 
-To build the client for production:
-
-```bash
-npm run build
-```
-
-The build output will be in the `dist` directory.
 
 ## API Endpoints
 
-### KRI Endpoints
 
-- `GET /kri/all` - Get all KRIs
-- `GET /kri/:kriId` - Get a specific KRI
-- `POST /kri/updateDescription` - Update KRI description
-- `POST /kri/update` - Update a KRI
-- `POST /kri/uploadDocument` - Upload a document for a KRI
-- `GET /kri/:kriId/documents` - Get documents for a KRI
 
 ### KRI Task Endpoints
 
@@ -98,26 +68,7 @@ The build output will be in the `dist` directory.
 - `GET /kri/tasks/:id` - Get a specific KRI task
 - `POST /kri/tasks/submitValue` - Submit a KRI value
 
-## Deployment
 
-This application can be deployed to Vercel. For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md).
-
-### Quick Deployment
-
-To deploy the frontend to Vercel:
-
-1. Go to the Vercel dashboard and create a new project
-2. Set the root directory to `client`
-3. Set the build command to `npm run build:prod`
-4. Set the output directory to `dist`
-5. Click "Deploy"
-
-Alternatively, you can use the Vercel CLI:
-
-```bash
-cd client
-vercel
-```
 
 ## Environment Variables
 

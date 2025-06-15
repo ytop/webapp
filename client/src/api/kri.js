@@ -1,53 +1,5 @@
 import request from '@/utils/request';
 
-/**
- * KRI Inventory API Functions
- */
-
-/**
- * Get all KRIs
- * @returns {Promise} Promise that resolves to an array of KRIs
- */
-export const getKRIs = async () => {
-    console.log("Fetching KRIs " +  `/kri/all`);
-    const response = await request.get(`/kri/all`);
-    return response.data;
-};
-
-/**
- * Update a KRI description
- * @param {string} kri_id - The ID of the KRI to update
- * @param {string} newDescription - The new description
- * @returns {Promise} Promise that resolves to the response data
- */
-export const updateKRIDescription = async (kri_id, newDescription) => {
-    console.log("Updating KRI description", kri_id, newDescription);
-    const response = await request.post(`/kri/updateDescription`, null, {
-        params: {
-            kriId: kri_id,
-            newDescription,
-        },
-    });
-    return response.data;
-};
-
-/**
- * Update a KRI with new data
- * @param {string} kriId - The ID of the KRI to update
- * @param {Object} kriData - The updated KRI data
- * @returns {Promise} Promise that resolves to the response data
- */
-export const updateKRI = async (kriId, kriData) => {
-    console.log("Updating KRI", kriId, kriData);
-    const response = await request.post(
-        `/kri/update`,
-        kriData,
-        {
-            params: { kriId }
-        }
-    );
-    return response.data;
-};
 
 /**
  * Upload a document for a KRI
